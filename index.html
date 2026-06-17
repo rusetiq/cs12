@@ -339,7 +339,8 @@
       position: relative;
       z-index: 2;
       display: flex;
-      flex-direction: column;
+      flex-direction: row;
+      gap: 2rem;
       padding: 2rem;
       height: 100vh;
       width: 100vw;
@@ -358,6 +359,8 @@
       display: flex;
       flex-direction: column;
       height: 100%;
+      width: 280px;
+      flex-shrink: 0;
     }
     .brand {
       display: flex;
@@ -449,6 +452,7 @@
       flex-direction: column;
       height: 100%;
       overflow: hidden;
+      flex-grow: 1;
     }
     .status-bar {
       background: rgba(10, 10, 10, 0.35);
@@ -1100,16 +1104,6 @@
 
   <div class="underlay-nav">
     <header class="underlay-nav__header">
-      <button data-underlay-nav-toggle aria-expanded="false" aria-label="open menu" class="underlay-nav__toggle">
-        <span class="underlay-nav__toggle-text">
-          <span class="underlay-nav__toggle-label">Menu</span>
-          <span class="underlay-nav__toggle-label">Close</span>
-        </span>
-        <span class="underlay-nav__toggle-icon">
-          <span class="underlay-nav__toggle-bar"></span>
-          <span class="underlay-nav__toggle-bar"></span>
-        </span>
-      </button>
     </header>
     <nav data-underlay-nav-menu class="underlay-nav__menu">
       <div class="underlay-nav__inner">
@@ -1157,10 +1151,34 @@
   </div>
 
   <div class="app-frame" data-main>
+    <aside class="sidebar" data-shape-mask>
+      <div class="brand">
+        <span class="brand-title">cs notes<span class="brand-dot">.</span>rusetiq</span>
+      </div>
+      <ul class="nav-list">
+        <li class="nav-item active" onclick="switchChapter(1)">1. Python Revision</li>
+        <li class="nav-item" onclick="switchChapter(2)">2. Functions</li>
+        <li class="nav-item" onclick="switchChapter(3)">3. Exception Handling</li>
+        <li class="nav-item" onclick="switchChapter(4)">4. File Handling</li>
+        <li class="nav-item" onclick="switchChapter(5)">5. Data Structures</li>
+        <li class="nav-item" onclick="switchChapter(6)">6. Computer Networks</li>
+      </ul>
+      <div class="config-panel">
+        <span class="config-title">SYSTEM CONFIG</span>
+        <div class="config-control">
+          <label for="sidebar-bg-scale-select">Interactivity Scale</label>
+          <select id="sidebar-bg-scale-select">
+            <option value="1">Medium (1.5x)</option>
+            <option value="2" selected>Max (3x)</option>
+            <option value="0.5">Quiet (0.5x)</option>
+          </select>
+        </div>
+      </div>
+    </aside>
+
     <div class="main-viewport">
       <div class="status-bar" data-shape-mask>
         <div class="status-item">
-          <span class="brand-title" style="font-size: 1.15rem; font-family: 'Space Grotesk', sans-serif; font-weight: 700; color: #fff; margin-right: 1.5rem;">cs notes<span class="brand-dot" style="color: #a3a3a3;">.</span>rusetiq</span>
           <span class="status-dot" id="status-pulse"></span>
           <span id="status-msg">CORE: ONLINE</span>
         </div>
@@ -1890,6 +1908,7 @@ val = queue.pop(0)</div>
   </div>
 
   <script>
+    gsap.registerPlugin(CustomEase);
     const clock = document.getElementById('terminal-clock');
     setInterval(() => {
       const now = new Date();
@@ -1910,6 +1929,15 @@ val = queue.pop(0)</div>
           link.classList.add('w--current');
         } else {
           link.classList.remove('w--current');
+        }
+      });
+      
+      const sidebarItems = document.querySelectorAll('.sidebar .nav-item');
+      sidebarItems.forEach((item, idx) => {
+        if (idx + 1 === chNum) {
+          item.classList.add('active');
+        } else {
+          item.classList.remove('active');
         }
       });
       
@@ -2414,11 +2442,12 @@ val = queue.pop(0)</div>
     var radiusVmin = 25;
     var speedIn = 0.45;
     var speedOut = 3.2;
-    var restScale = 0.0;
+    var restScale = 0.2;
     var minHoverScale = 1.0;
     var maxHoverScale = 2.8;
-    var waveSpeed = 1100;
-    var waveWidth = 170;
+    var waveSpeed = 500;
+    var waveWidth = 280;
+    var hoverDecayRate = 0.0005;
 
     var PALETTE = [
       { type: 'solid', value: '#e2e8f0' },
@@ -2632,7 +2661,7 @@ val = queue.pop(0)</div>
         if (targetHover > shape.hoverEnergy) {
           shape.hoverEnergy += (targetHover - shape.hoverEnergy) * 0.2;
         } else {
-          shape.hoverEnergy += (targetHover - shape.hoverEnergy) * 0.002;
+          shape.hoverEnergy += (targetHover - shape.hoverEnergy) * hoverDecayRate;
         }
 
         var waveInfluence = 0;
@@ -2647,7 +2676,7 @@ val = queue.pop(0)</div>
         }
 
         var combinedInfluence = Math.max(shape.hoverEnergy * scaleMultiplier, waveInfluence);
-        var target = combinedInfluence * shape.maxScale;
+        var target = restScale + combinedInfluence * (shape.maxScale - restScale);
 
         var factor = target > shape.scale ? durationToFactor(speedIn) : durationToFactor(speedOut);
         shape.scale += (target - shape.scale) * factor;
@@ -2675,22 +2704,42 @@ val = queue.pop(0)</div>
       triggerWave(e.clientX, e.clientY);
     }
 
+    var waveTimeoutId = null;
     function triggerWave(x, y) {
       x = x !== undefined ? x : window.innerWidth / 2;
       y = y !== undefined ? y : window.innerHeight / 2;
       waves.push({ x: x, y: y, startTime: performance.now() });
       maskOverride = true;
       var delay = Math.sqrt(window.innerWidth * window.innerWidth + window.innerHeight * window.innerHeight) / waveSpeed;
-      setTimeout(function() { maskOverride = false; }, delay * 1000);
+      if (waveTimeoutId) clearTimeout(waveTimeoutId);
+      waveTimeoutId = setTimeout(function() { maskOverride = false; }, delay * 1000);
     }
 
     window.addEventListener('resize', initGridCanvas);
     window.addEventListener('pointermove', onPointerMove);
     window.addEventListener('click', onCanvasClick);
 
-    document.getElementById('bg-scale-select').addEventListener('change', (e) => {
-      scaleMultiplier = parseFloat(e.target.value);
-    });
+    function updateScaleMultiplier(value) {
+      scaleMultiplier = parseFloat(value);
+      const sel1 = document.getElementById('bg-scale-select');
+      const sel2 = document.getElementById('sidebar-bg-scale-select');
+      if (sel1 && sel1.value !== value) sel1.value = value;
+      if (sel2 && sel2.value !== value) sel2.value = value;
+    }
+
+    const scaleDropdown1 = document.getElementById('bg-scale-select');
+    if (scaleDropdown1) {
+      scaleDropdown1.addEventListener('change', (e) => {
+        updateScaleMultiplier(e.target.value);
+      });
+    }
+
+    const scaleDropdown2 = document.getElementById('sidebar-bg-scale-select');
+    if (scaleDropdown2) {
+      scaleDropdown2.addEventListener('change', (e) => {
+        updateScaleMultiplier(e.target.value);
+      });
+    }
 
     initGridCanvas();
     rafId = requestAnimationFrame(tickGridCanvas);
@@ -2716,6 +2765,7 @@ val = queue.pop(0)</div>
       
       gsap.set(overlayEl, { visibility: "hidden", pointerEvents: "none" });
       gsap.set(mainEl, { x: 0 });
+      gsap.set(menuEl, { xPercent: 100 });
       gsap.set(toggleLabels, { yPercent: 0 });
       gsap.set(toggleBars, { y: 0, rotation: 0 });
       
@@ -2732,6 +2782,11 @@ val = queue.pop(0)</div>
         
         tl.to([mainEl, overlayEl], {
           x: getMenuOffset,
+          duration: 0.7,
+        }, 0)
+        
+        .to(menuEl, {
+          xPercent: 0,
           duration: 0.7,
         }, 0)
         
