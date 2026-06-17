@@ -1,0 +1,2933 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>cs notes - rusetiq</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono&family=Foldit:wght@100..900&family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;700&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.2/dist/CustomEase.min.js"></script>
+  <style>
+    :root {
+      --bg-dark: #080808;
+      --bg-card: rgba(10, 10, 10, 0.45);
+      --border-color: rgba(255, 255, 255, 0.08);
+      --border-glow: rgba(255, 255, 255, 0.15);
+      --primary: #ffffff;
+      --secondary: #e5e5e5;
+      --accent: #a3a3a3;
+      --success: #4ade80;
+      --danger: #f87171;
+      --text-main: #f4f4f5;
+      --text-muted: #a1a1aa;
+      --menu-width: 32em;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-family: 'Inter', sans-serif;
+      overflow: hidden;
+      height: 100vh;
+      width: 100vw;
+    }
+    .willem-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: #efefef;
+      color: #201d1d;
+      z-index: 9999;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: opacity 0.8s ease-in-out;
+    }
+    .willem-header.is--hidden {
+      display: none;
+    }
+    .willem-loader {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+    .willem__h1 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 10vw;
+      font-weight: 700;
+      line-height: 0.75;
+      display: flex;
+      position: relative;
+      white-space: nowrap;
+    }
+    .willem__h1-start {
+      justify-content: flex-end;
+      width: 2.1em;
+      display: flex;
+      overflow: hidden;
+    }
+    .willem__h1-end {
+      justify-content: flex-start;
+      width: 1.6em;
+      display: flex;
+      overflow: hidden;
+    }
+    .willem__letter {
+      display: block;
+      position: relative;
+    }
+    .willem-loader__box {
+      display: flex;
+      flex-flow: column;
+      justify-content: center;
+      align-items: center;
+      width: 0;
+      position: relative;
+    }
+    .willem-loader__box-inner {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-width: 1em;
+      height: 95%;
+      position: relative;
+    }
+    .willem__growing-image {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 0%;
+      height: 100%;
+      position: absolute;
+      overflow: hidden;
+    }
+    .willem__growing-image-wrap {
+      width: 100%;
+      min-width: 1em;
+      height: 100%;
+      position: absolute;
+    }
+    .willem__cover-image {
+      pointer-events: none;
+      object-fit: cover;
+      user-select: none;
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+    .willem__cover-image-extra {
+      pointer-events: none;
+      object-fit: cover;
+      user-select: none;
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+    .willem__cover-image-extra.is--1 { z-index: 3; }
+    .willem__cover-image-extra.is--2 { z-index: 2; }
+    .willem__cover-image-extra.is--3 { z-index: 1; }
+    .willem-header__content {
+      display: flex;
+      flex-flow: column;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      min-height: 100vh;
+      padding: 3em;
+      position: relative;
+      opacity: 0;
+    }
+    .willem-header__top {
+      width: 100%;
+      position: relative;
+    }
+    .willem-header__bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      width: 100%;
+      position: relative;
+      overflow: hidden;
+    }
+    .willen-nav {
+      display: flex;
+      position: relative;
+      width: 100%;
+      justify-content: space-between;
+    }
+    .willem-nav__link {
+      color: inherit;
+      font-size: 1.25em;
+      text-decoration: none;
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+    }
+    .willem__letter-white {
+      display: block;
+      position: relative;
+    }
+    #bg-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+    }
+    .underlay-nav {
+      position: fixed;
+      inset: 0;
+      z-index: 10;
+      pointer-events: none;
+    }
+    .underlay-nav__header {
+      z-index: 100;
+      color: #fff;
+      position: fixed;
+      inset: 2rem 2rem auto auto;
+      pointer-events: auto;
+    }
+    .underlay-nav__toggle {
+      background: rgba(10, 10, 10, 0.4);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 999px;
+      color: #fff;
+      padding: 0.8rem 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      cursor: pointer;
+      box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.1);
+    }
+    .underlay-nav__toggle-text {
+      display: flex;
+      flex-direction: column;
+      height: 1.2rem;
+      overflow: hidden;
+      justify-content: flex-start;
+      align-items: flex-end;
+    }
+    .underlay-nav__toggle-label {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 700;
+      line-height: 1.2rem;
+    }
+    .underlay-nav__toggle-icon {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      width: 1.25rem;
+    }
+    .underlay-nav__toggle-bar {
+      background-color: currentColor;
+      width: 100%;
+      height: 2px;
+      transition: transform 0.3s;
+    }
+    .underlay-nav__menu {
+      z-index: 10;
+      width: var(--menu-width);
+      position: fixed;
+      top: 0;
+      bottom: 0;
+      right: 0;
+      background: rgba(10, 10, 10, 0.95);
+      backdrop-filter: blur(40px);
+      border-left: 1px solid var(--border-color);
+      transform: translateX(100%);
+      pointer-events: auto;
+    }
+    .underlay-nav__inner {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 100%;
+      padding: 8rem 3rem 3rem;
+    }
+    .underlay-nav__list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+    .underlay-nav__link-large {
+      text-decoration: none;
+      color: var(--text-muted);
+      display: block;
+      transition: color 0.3s;
+    }
+    .underlay-nav__link-large:hover {
+      color: #fff;
+    }
+    .underlay-nav__link-label {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 2.2rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+    .underlay-nav__bottom {
+      border-top: 1px solid var(--border-color);
+      padding-top: 2rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+    }
+    .underlay-nav__bottom-col {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    .underlay-nav__link-small {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      text-decoration: none;
+    }
+    .underlay-nav__link-small.is--faded {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      opacity: 0.5;
+    }
+    .underlay-nav__select {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      padding: 0.45rem 1rem;
+      color: #fff;
+      outline: none;
+      font-family: inherit;
+      font-size: 0.85rem;
+      cursor: pointer;
+      margin-top: 0.25rem;
+      transition: all 0.3s;
+    }
+    .underlay-nav__select:focus {
+      border-color: #fff;
+    }
+    .underlay-nav__overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 5;
+      background: rgba(0, 0, 0, 0.4);
+      opacity: 0;
+      pointer-events: none;
+      visibility: hidden;
+      transition: opacity 0.5s;
+    }
+    .app-frame {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      padding: 2rem;
+      height: 100vh;
+      width: 100vw;
+      transition: transform 0.7s cubic-bezier(0.32, 0.72, 0, 1);
+    }
+    .sidebar {
+      background: rgba(10, 10, 10, 0.35);
+      backdrop-filter: blur(40px) saturate(180%);
+      -webkit-backdrop-filter: blur(40px) saturate(180%);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 28px;
+      box-shadow: 
+        inset 0 1px 1px rgba(255, 255, 255, 0.12),
+        0 20px 50px rgba(0, 0, 0, 0.8);
+      padding: 2.5rem 1.75rem;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      margin-bottom: 3rem;
+    }
+    .brand-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.55rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: #fff;
+    }
+    .brand-dot {
+      color: #a3a3a3;
+    }
+    .nav-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+      flex-grow: 1;
+    }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      padding: 0.95rem 1.25rem;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: all 0.25s cubic-bezier(0.256, 0.009, 0.125, 0.997);
+      color: var(--text-muted);
+      border: none;
+      font-size: 0.95rem;
+      font-weight: 500;
+      background: rgba(255, 255, 255, 0.04);
+    }
+    .nav-item:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.08);
+    }
+    .nav-item.active {
+      color: #000;
+      background: #fff;
+      box-shadow: 0 4px 15px rgba(255, 255, 255, 0.15);
+    }
+    .config-panel {
+      border-top: 1px solid var(--border-color);
+      padding-top: 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+    .config-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-muted);
+    }
+    .config-control {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .config-control label {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+    .config-control select {
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 0.65rem;
+      color: var(--text-main);
+      outline: none;
+      font-family: inherit;
+      font-size: 0.85rem;
+      transition: all 0.3s;
+    }
+    .config-control select:focus {
+      border-color: #fff;
+    }
+    .main-viewport {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      overflow: hidden;
+    }
+    .status-bar {
+      background: rgba(10, 10, 10, 0.35);
+      backdrop-filter: blur(40px) saturate(180%);
+      -webkit-backdrop-filter: blur(40px) saturate(180%);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 18px;
+      box-shadow: 
+        inset 0 1px 1px rgba(255, 255, 255, 0.1),
+        0 10px 30px rgba(0, 0, 0, 0.5);
+      padding: 1rem 2.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+    .status-item {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      background-color: var(--success);
+      border-radius: 50%;
+      box-shadow: 0 0 10px var(--success);
+    }
+    .chapter-view-wrapper {
+      flex-grow: 1;
+      overflow-y: auto;
+      padding-right: 0.5rem;
+    }
+    .chapter-view {
+      display: none;
+      width: 100%;
+      height: 100%;
+    }
+    .chapter-view.active {
+      display: grid;
+      grid-template-columns: 1fr 480px;
+      gap: 2rem;
+    }
+    .notes-column {
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+      overflow-y: auto;
+      padding-bottom: 2rem;
+    }
+    .interactive-column {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      height: 100%;
+      overflow-y: auto;
+      padding-bottom: 2rem;
+    }
+    .section-card {
+      background: rgba(10, 10, 10, 0.25);
+      backdrop-filter: blur(40px) saturate(180%);
+      -webkit-backdrop-filter: blur(40px) saturate(180%);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 24px;
+      padding: 2.5rem;
+      box-shadow: 
+        inset 0 1px 1px rgba(255, 255, 255, 0.1),
+        0 15px 35px rgba(0, 0, 0, 0.6);
+    }
+    .section-card h2 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 2.2rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 1.5rem;
+      color: #fff;
+    }
+    .section-card h3 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.45rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin: 2rem 0 1rem 0;
+      color: #fff;
+    }
+    .section-card p {
+      font-size: 1.05rem;
+      line-height: 1.8;
+      color: var(--text-main);
+      margin-bottom: 1.5rem;
+    }
+    .section-card ul {
+      margin-left: 1.75rem;
+      margin-bottom: 1.75rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    .section-card li {
+      font-size: 1.05rem;
+      line-height: 1.7;
+    }
+    .code-block {
+      background: rgba(0, 0, 0, 0.6);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 1.5rem;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.9rem;
+      color: #f8fafc;
+      margin: 1.5rem 0;
+      position: relative;
+      overflow-x: auto;
+      box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.6);
+    }
+    .code-block::before {
+      content: 'PYTHON';
+      position: absolute;
+      top: 0.4rem;
+      right: 1rem;
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      font-weight: 800;
+      letter-spacing: 1px;
+    }
+    .tab-container {
+      display: flex;
+      gap: 0.5rem;
+      border-bottom: 1px solid var(--border-color);
+      margin-bottom: 2rem;
+      padding-bottom: 0.75rem;
+      overflow-x: auto;
+    }
+    .tab-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: 0.9rem;
+      padding: 0.65rem 1.25rem;
+      cursor: pointer;
+      border-radius: 999px;
+      transition: all 0.25s cubic-bezier(0.256, 0.009, 0.125, 0.997);
+      white-space: nowrap;
+    }
+    .tab-btn:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.05);
+    }
+    .tab-btn.active {
+      color: #000;
+      background: #fff;
+    }
+    .tab-content {
+      display: none;
+    }
+    .tab-content.active {
+      display: block;
+    }
+    .word-mask {
+      display: inline-block;
+      overflow: hidden;
+      vertical-align: top;
+    }
+    .word-inner {
+      display: inline-block;
+      transform: translateY(100%);
+    }
+    .widget-panel {
+      background: rgba(10, 10, 10, 0.25);
+      backdrop-filter: blur(40px) saturate(180%);
+      -webkit-backdrop-filter: blur(40px) saturate(180%);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      box-shadow: 
+        inset 0 1px 1px rgba(255, 255, 255, 0.12),
+        0 15px 35px rgba(0, 0, 0, 0.6);
+      border-radius: 24px;
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      height: 100%;
+    }
+    .widget-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 1rem;
+    }
+    .widget-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .widget-badge {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border-color);
+      color: #fff;
+      font-size: 0.7rem;
+      font-family: 'DM Mono', monospace;
+      padding: 0.25rem 0.5rem;
+      border-radius: 6px;
+      font-weight: 700;
+    }
+    .widget-content {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+      flex-grow: 1;
+    }
+    .liquid-metal-btn {
+      position: relative;
+      width: 100%;
+      height: 48px;
+      border-radius: 24px;
+      cursor: pointer;
+    }
+    .liquid-metal-btn::before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: calc(100% - 6px);
+      height: 42px;
+      background: linear-gradient(120deg, #161616, #090909);
+      border-radius: 21px;
+      box-shadow: inset 0 2px 3px rgba(255, 255, 255, 0.1);
+    }
+    .outline {
+      position: relative;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: calc(100% - 2px);
+      height: 46px;
+      border-radius: 23px;
+      z-index: 1;
+    }
+    .outline::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      padding: 1.5px;
+      border-radius: inherit;
+      background: conic-gradient(from 180deg, #fff, #555, #fff, #555, #fff);
+      filter: grayscale(1);
+      -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+      -webkit-mask-composite: xor;
+      mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+      mask-composite: exclude;
+      transition: all 0.3s ease;
+    }
+    .liquid-metal-btn:hover .outline::before {
+      filter: grayscale(0);
+      background: conic-gradient(from 180deg, #fff, #a2a2a2, #fff, #a2a2a2, #fff);
+    }
+    .btn-text {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: #fff;
+    }
+    .slicing-visualizer {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+    .slice-grid {
+      display: flex;
+      justify-content: center;
+      gap: 0.4rem;
+      margin: 1rem 0;
+      overflow-x: auto;
+      padding: 0.5rem 0;
+    }
+    .slice-cell {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: rgba(0, 0, 0, 0.5);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      width: 48px;
+      flex-shrink: 0;
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .slice-cell.selected {
+      border-color: var(--success);
+      background: rgba(74, 222, 128, 0.15);
+      box-shadow: 0 0 12px rgba(74, 222, 128, 0.2);
+    }
+    .slice-idx-top {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      padding: 0.35rem 0;
+      font-family: 'DM Mono', monospace;
+    }
+    .slice-char {
+      font-size: 1.35rem;
+      font-weight: 800;
+      padding: 0.6rem 0;
+      color: #fff;
+    }
+    .slice-idx-bot {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      padding: 0.35rem 0;
+      font-family: 'DM Mono', monospace;
+    }
+    .slice-inputs {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.75rem;
+    }
+    .stack-frame-container {
+      display: flex;
+      flex-direction: column-reverse;
+      gap: 0.5rem;
+      background: rgba(0, 0, 0, 0.55);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 1.25rem;
+      min-height: 220px;
+      justify-content: flex-start;
+      box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.5);
+    }
+    .stack-frame {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 0.85rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.85rem;
+      animation: slideInUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .stack-frame.active {
+      border-color: #fff;
+      background: rgba(255, 255, 255, 0.05);
+      box-shadow: 0 0 12px rgba(255, 255, 255, 0.1);
+    }
+    .stack-frame.returning {
+      border-color: var(--success);
+      background: rgba(74, 222, 128, 0.15);
+    }
+    .flow-step-container {
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+    .flow-line {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.85rem;
+      padding: 0.65rem;
+      border-radius: 8px;
+      border-left: 3px solid transparent;
+      color: var(--text-muted);
+      transition: all 0.3s;
+    }
+    .flow-line.highlight {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.04);
+      border-left-color: var(--accent);
+    }
+    .flow-line.executing {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.08);
+      border-left-color: #fff;
+    }
+    .file-stream-visualizer {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+    .stream-buffer {
+      display: flex;
+      gap: 4px;
+      background: rgba(0, 0, 0, 0.5);
+      padding: 1.25rem;
+      border-radius: 16px;
+      border: 1px solid var(--border-color);
+      overflow-x: auto;
+      box-shadow: inset 0 2px 8px rgba(0,0,0,0.5);
+    }
+    .buffer-byte {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 40px;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      font-family: 'DM Mono', monospace;
+      font-size: 0.85rem;
+      flex-shrink: 0;
+      border-radius: 6px;
+    }
+    .buffer-byte.pointer {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: #fff;
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.15);
+    }
+    .buffer-byte.read-highlight {
+      background: rgba(74, 222, 128, 0.2);
+      border-color: var(--success);
+    }
+    .stream-meta {
+      display: flex;
+      justify-content: space-between;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+    .data-struct-visualizer {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.25rem;
+    }
+    .struct-container {
+      background: rgba(0, 0, 0, 0.5);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 1.25rem;
+      height: 260px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      position: relative;
+      box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.4);
+    }
+    .struct-label {
+      position: absolute;
+      top: 0.65rem;
+      left: 0.65rem;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--text-muted);
+      font-weight: 800;
+    }
+    .stack-visual-list {
+      display: flex;
+      flex-direction: column-reverse;
+      gap: 0.4rem;
+      overflow-y: auto;
+    }
+    .queue-visual-list {
+      display: flex;
+      gap: 0.4rem;
+      overflow-x: auto;
+      align-items: center;
+      height: 100%;
+      padding-top: 1.75rem;
+    }
+    .struct-item {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 0.65rem;
+      text-align: center;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.85rem;
+      color: #fff;
+      animation: scaleIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      min-width: 60px;
+    }
+    .topology-canvas-container {
+      background: rgba(0, 0, 0, 0.5);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: inset 0 2px 8px rgba(0,0,0,0.4);
+    }
+    #topology-canvas {
+      width: 100%;
+      height: 250px;
+      display: block;
+    }
+    .quiz-card {
+      background: rgba(255, 255, 255, 0.01);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 1.75rem;
+      margin-top: 2.5rem;
+      box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.05);
+    }
+    .quiz-question {
+      font-weight: 700;
+      margin-bottom: 1.25rem;
+      font-size: 1.05rem;
+    }
+    .quiz-options {
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+    }
+    .quiz-option {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(0, 0, 0, 0.35);
+      border: 1px solid var(--border-color);
+      padding: 0.85rem 1.25rem;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: all 0.3s;
+    }
+    .quiz-option:hover {
+      background: rgba(255, 255, 255, 0.05);
+      border-color: rgba(255, 255, 255, 0.15);
+    }
+    .quiz-option.selected {
+      border-color: #fff;
+      background: rgba(255, 255, 255, 0.04);
+    }
+    .quiz-option.correct {
+      border-color: var(--success) !important;
+      background: rgba(74, 222, 128, 0.1) !important;
+    }
+    .quiz-option.incorrect {
+      border-color: var(--danger) !important;
+      background: rgba(248, 113, 113, 0.1) !important;
+    }
+    .quiz-feedback {
+      margin-top: 1rem;
+      font-size: 0.85rem;
+      font-family: 'DM Mono', monospace;
+      display: none;
+    }
+    .console-panel {
+      background: #020202;
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 1.25rem;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.8rem;
+      color: #94a3b8;
+      min-height: 100px;
+      max-height: 140px;
+      overflow-y: auto;
+      margin-top: auto;
+      box-shadow: inset 0 2px 8px rgba(0,0,0,0.6);
+    }
+    .console-line {
+      line-height: 1.5;
+    }
+    .console-input-prefix {
+      color: var(--accent);
+    }
+    .console-text-success {
+      color: var(--success);
+    }
+    .console-text-error {
+      color: var(--danger);
+    }
+    .console-text-info {
+      color: var(--accent);
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes slideInUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes scaleIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+  </style>
+</head>
+<body>
+  <section class="willem-header">
+    <div class="willem-loader">
+      <div class="willem__h1">
+        <div class="willem__h1-start">
+          <span class="willem__letter">L</span>
+          <span class="willem__letter">O</span>
+          <span class="willem__letter">A</span>
+          <span class="willem__letter">D</span>
+        </div>
+        <div class="willem-loader__box">
+          <div class="willem-loader__box-inner">
+            <div class="willem__growing-image">
+              <div class="willem__growing-image-wrap">
+                 <img class="willem__cover-image-extra is--1" src="./screenshot.png" loading="lazy" alt="">
+                 <img class="willem__cover-image-extra is--2" src="./screenshot.png" loading="lazy" alt="">
+                 <img class="willem__cover-image-extra is--3" src="./screenshot.png" loading="lazy" alt="">
+                 <img class="willem__cover-image" src="./screenshot.png" loading="lazy" alt="">
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="willem__h1-end">
+          <span class="willem__letter">I</span>
+          <span class="willem__letter">N</span>
+          <span class="willem__letter">G</span>
+        </div>
+      </div>
+    </div>
+    <div class="willem-header__content">
+      <div class="willem-header__top">
+        <nav class="willen-nav">
+          <span class="willem-nav__link">cs notes - rusetiq</span>
+          <div style="display:flex; gap:1.5rem;">
+            <span class="willem-nav__link">Projects,</span>
+            <span class="willem-nav__link">Services,</span>
+            <span class="willem-nav__link">Blog (12)</span>
+          </div>
+        </nav>
+      </div>
+      <div class="willem-header__bottom">
+        <div class="willem__h1">
+          <span class="willem__letter-white">L</span>
+          <span class="willem__letter-white">O</span>
+          <span class="willem__letter-white">A</span>
+          <span class="willem__letter-white">D</span>
+          <span class="willem__letter-white">I</span>
+          <span class="willem__letter-white">N</span>
+          <span class="willem__letter-white">G</span>
+        </div>
+        <p class="osmo-credits__p">cs notes - rusetiq</p>
+      </div>
+    </div>
+  </section>
+
+  <canvas id="bg-canvas"></canvas>
+
+  <div class="underlay-nav">
+    <header class="underlay-nav__header">
+      <button data-underlay-nav-toggle aria-expanded="false" aria-label="open menu" class="underlay-nav__toggle">
+        <span class="underlay-nav__toggle-text">
+          <span class="underlay-nav__toggle-label">Menu</span>
+          <span class="underlay-nav__toggle-label">Close</span>
+        </span>
+        <span class="underlay-nav__toggle-icon">
+          <span class="underlay-nav__toggle-bar"></span>
+          <span class="underlay-nav__toggle-bar"></span>
+        </span>
+      </button>
+    </header>
+    <nav data-underlay-nav-menu class="underlay-nav__menu">
+      <div class="underlay-nav__inner">
+        <ul class="underlay-nav__list">
+          <li data-reveal-l>
+            <a href="#" class="underlay-nav__link-large" onclick="switchChapterFromMenu(1)"><span class="underlay-nav__link-label">1. Python Revision</span></a>
+          </li>
+          <li data-reveal-l>
+            <a href="#" class="underlay-nav__link-large" onclick="switchChapterFromMenu(2)"><span class="underlay-nav__link-label">2. Functions</span></a>
+          </li>
+          <li data-reveal-l>
+            <a href="#" class="underlay-nav__link-large" onclick="switchChapterFromMenu(3)"><span class="underlay-nav__link-label">3. Exceptions</span></a>
+          </li>
+          <li data-reveal-l>
+            <a href="#" class="underlay-nav__link-large" onclick="switchChapterFromMenu(4)"><span class="underlay-nav__link-label">4. File Handling</span></a>
+          </li>
+          <li data-reveal-l>
+            <a href="#" class="underlay-nav__link-large" onclick="switchChapterFromMenu(5)"><span class="underlay-nav__link-label">5. Structures</span></a>
+          </li>
+          <li data-reveal-l>
+            <a href="#" class="underlay-nav__link-large" onclick="switchChapterFromMenu(6)"><span class="underlay-nav__link-label">6. Networks</span></a>
+          </li>
+        </ul>
+        <div class="underlay-nav__bottom">
+          <div class="underlay-nav__bottom-col" data-reveal-s>
+            <span class="underlay-nav__link-small is--faded">Identity</span>
+            <span class="underlay-nav__link-small">cs notes - rusetiq</span>
+          </div>
+          <div class="underlay-nav__bottom-col" data-reveal-s>
+            <span class="underlay-nav__link-small is--faded">Topic</span>
+            <span class="underlay-nav__link-small">Computer Science XII</span>
+          </div>
+          <div class="underlay-nav__bottom-col" data-reveal-s>
+            <span class="underlay-nav__link-small is--faded">Interactivity</span>
+            <select id="bg-scale-select" class="underlay-nav__select">
+              <option value="1">Medium (1.5x)</option>
+              <option value="2" selected>Max (3x)</option>
+              <option value="0.5">Quiet (0.5x)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </nav>
+    <div data-underlay-nav-overlay class="underlay-nav__overlay"></div>
+  </div>
+
+  <div class="app-frame" data-main>
+    <div class="main-viewport">
+      <div class="status-bar" data-shape-mask>
+        <div class="status-item">
+          <span class="brand-title" style="font-size: 1.15rem; font-family: 'Space Grotesk', sans-serif; font-weight: 700; color: #fff; margin-right: 1.5rem;">cs notes<span class="brand-dot" style="color: #a3a3a3;">.</span>rusetiq</span>
+          <span class="status-dot" id="status-pulse"></span>
+          <span id="status-msg">CORE: ONLINE</span>
+        </div>
+        <div class="status-item" id="terminal-clock">16:04:26</div>
+      </div>
+
+      <div class="chapter-view-wrapper">
+        <div class="chapter-view active" id="ch-1">
+          <div class="notes-column">
+            <div class="section-card" data-shape-mask>
+              <h2>Python Revision Tour</h2>
+              <p>Revisiting the essential structural pillars of Python. This review establishes key variables, lexical rules, sequence operations, and native mapping strategies.</p>
+              
+              <div class="tab-container">
+                <button class="tab-btn active" onclick="switchTab(this, 'ch1-tokens')">Tokens & Types</button>
+                <button class="tab-btn" onclick="switchTab(this, 'ch1-operators')">Operators</button>
+                <button class="tab-btn" onclick="switchTab(this, 'ch1-control')">Control Loops</button>
+                <button class="tab-btn" onclick="switchTab(this, 'ch1-sequences')">Lists & Tuples</button>
+                <button class="tab-btn" onclick="switchTab(this, 'ch1-dicts')">Dictionaries</button>
+              </div>
+
+              <div class="tab-content active" id="ch1-tokens">
+                <h3>Tokens and Identifiers</h3>
+                <p>A token represents the smallest individual syntax unit that the Python interpreter processes. Python recognizes five distinct kinds of tokens:</p>
+                <ul>
+                  <li><strong>Keywords:</strong> Reserved words that have preset semantic definitions within the compiler namespace (e.g. <code>False</code>, <code>class</code>, <code>def</code>, <code>lambda</code>, <code>nonlocal</code>).</li>
+                  <li><strong>Identifiers:</strong> Unique labels assigned to variables, objects, and user-defined helper methods.
+                    <ul>
+                      <li>Must begin with an alphabetical character <code>[a-zA-Z]</code> or a leading underscore <code>_</code>.</li>
+                      <li>Can contain numeric values but cannot start with a digit.</li>
+                      <li>Special character symbols (e.g., <code>$</code>, <code>@</code>) and space characters are strictly prohibited.</li>
+                      <li>Keywords cannot be used as identifier labels.</li>
+                    </ul>
+                  </li>
+                  <li><strong>Literals:</strong> Values that remain constant:
+                    <ul>
+                      <li>String: Defined inside single, double, or triple quotation marks.</li>
+                      <li>Numeric: Signed integers (decimal, octal e.g. <code>0o12</code>, hex e.g. <code>0xAF</code>), float values (decimal and scientific e.g. <code>1.4e-3</code>), and complex numbers (e.g. <code>2 + 3.5j</code>).</li>
+                      <li>Boolean: <code>True</code> and <code>False</code>.</li>
+                      <li>Special: The <code>None</code> value.</li>
+                    </ul>
+                  </li>
+                </ul>
+                <h3>Data Types & Type Conversion</h3>
+                <p>Python variables map values dynamically. Standard built-in data types include:</p>
+                <div class="code-block">value_int = 101
+value_float = 28.75
+value_complex = 3 + 4j
+value_str = "APEX"
+value_bool = True</div>
+                <p><strong>Type conversion</strong> is divided into:
+                  <ul>
+                    <li><strong>Implicit Conversion:</strong> The interpreter automatically changes data types to prevent data loss (e.g. dividing an integer by float automatically yields a float representation).</li>
+                    <li><strong>Explicit Conversion (Casting):</strong> Done manually by calling type conversion methods like <code>int()</code>, <code>float()</code>, <code>str()</code>, <code>bool()</code>, <code>list()</code>, <code>tuple()</code>.</li>
+                  </ul>
+                </p>
+              </div>
+
+              <div class="tab-content" id="ch1-operators">
+                <h3>Operators in Python</h3>
+                <p>Operators process variables and literals. Python categorizes them as follows:</p>
+                <ul>
+                  <li><strong>Arithmetic:</strong> Modulo <code>%</code> (returns division remainder), Floor division <code>//</code> (rounds division result down to the nearest integer), exponentiation <code>**</code>, addition, subtraction, multiplication, and division.</li>
+                  <li><strong>Relational:</strong> Compare values (<code>==</code>, <code>!=</code>, <code>&lt;</code>, <code>&gt;</code>, <code>&lt;=</code>, <code>&gt;=</code>), returning boolean outputs.</li>
+                  <li><strong>Logical:</strong> Chains conditional evaluations using <code>and</code>, <code>or</code>, and <code>not</code>.</li>
+                  <li><strong>Assignment:</strong> Assigns values (<code>=</code>) and modifies them inline (e.g., <code>+=</code>, <code>*=</code>, <code>//=</code>).</li>
+                  <li><strong>Identity:</strong> <code>is</code> and <code>is not</code> check memory location identities (verifying if <code>id(a) == id(b)</code>, unlike value checks like <code>a == b</code>).</li>
+                  <li><strong>Membership:</strong> <code>in</code> and <code>not in</code> check whether a value exists inside sequences (like lists, strings, or tuple elements).</li>
+                </ul>
+              </div>
+
+              <div class="tab-content" id="ch1-control">
+                <h3>Control Structures</h3>
+                <p>Control structures manage the flow of code execution:</p>
+                <ul>
+                  <li><strong>Conditional Branching:</strong> The <code>if-elif-else</code> statement evaluates condition values to choose which code block runs.</li>
+                  <li><strong>Looping Iterations:</strong>
+                    <ul>
+                      <li><code>while</code>: Loops as long as the condition holds.</li>
+                      <li><code>for</code>: Cycles through items in a sequence or a numeric <code>range()</code>.</li>
+                      <li>Both loops support an optional <code>else</code> block, which runs when the loop finishes normally without hitting a <code>break</code>.</li>
+                    </ul>
+                  </li>
+                  <li><strong>Control Words:</strong> <code>break</code> (abruptly exits the loop), <code>continue</code> (skips the rest of the current iteration, returning to the loop header), and <code>pass</code> (acts as a syntactic placeholder statement).</li>
+                </ul>
+              </div>
+
+              <div class="tab-content" id="ch1-sequences">
+                <h3>Strings, Lists, and Tuples</h3>
+                <p>Python organizes ordered data collections as sequences:</p>
+                <ul>
+                  <li><strong>Strings:</strong> Immutable Unicode sequences. Operations include:
+                    <ul>
+                      <li>Indexing: Access characters using positive (<code>0</code> to <code>len-1</code>) or negative (<code>-1</code> to <code>-len</code>) offsets.</li>
+                      <li>Slicing: Retrieve substrings using <code>[start:stop:step]</code>.</li>
+                      <li>Methods: <code>upper()</code>, <code>lower()</code>, <code>find()</code>, <code>split()</code>, <code>strip()</code>, <code>replace()</code>.</li>
+                    </ul>
+                  </li>
+                  <li><strong>Lists:</strong> Mutable, ordered collections. Elements can be updated in-place. Methods include <code>append()</code>, <code>insert()</code>, <code>remove()</code>, <code>pop()</code>, <code>sort()</code>, and <code>extend()</code>. List comprehensions offer syntax for inline creation: <code>[x**2 for x in values if x > 0]</code>.</li>
+                  <li><strong>Tuples:</strong> Immutable sequences. Once created, their elements cannot be changed. Created using parentheses <code>()</code>. Single element tuples require a trailing comma: <code>(5,)</code>.</li>
+                </ul>
+              </div>
+
+              <div class="tab-content" id="ch1-dicts">
+                <h3>Dictionaries</h3>
+                <p>Dictionaries represent mapping structures that match key objects to data values:</p>
+                <ul>
+                  <li>Keys must be immutable types (e.g. strings, integers, tuples). Duplicate keys are not allowed.</li>
+                  <li>Values can be accessed using <code>dict[key]</code> or the safe lookup method <code>dict.get(key, default)</code>, which avoids raising a <code>KeyError</code>.</li>
+                  <li>Core operations: <code>keys()</code> (retrieves all keys), <code>values()</code> (retrieves all values), <code>items()</code> (retrieves key-value tuple pairs), and <code>update()</code> (merges another dictionary).</li>
+                </ul>
+              </div>
+
+              <div class="quiz-card" id="quiz-ch1">
+                <div class="quiz-question">Which of the following slicing outputs for string S = "COMPUTER" yields "PUT"?</div>
+                <div class="quiz-options">
+                  <div class="quiz-option" onclick="checkQuiz(this, 'correct', 'quiz-ch1-fb', 'Correct! S[3:6] gets chars from index 3 up to 5.')">S[3:6]</div>
+                  <div class="quiz-option" onclick="checkQuiz(this, 'incorrect', 'quiz-ch1-fb', 'Incorrect. S[3:5] only gets index 3 and 4 (PU).')">S[3:5]</div>
+                  <div class="quiz-option" onclick="checkQuiz(this, 'incorrect', 'quiz-ch1-fb', 'Incorrect. Remember that python slices are exclusive of the stop index.')">S[2:5]</div>
+                </div>
+                <div class="quiz-feedback" id="quiz-ch1-fb"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="interactive-column">
+            <div class="widget-panel" data-shape-mask>
+              <div class="widget-header">
+                <span class="widget-title">String Slicing Visualizer</span>
+                <span class="widget-badge">LIVE MODULE</span>
+              </div>
+              <div class="widget-content">
+                <div class="slicing-visualizer">
+                  <div class="config-control">
+                    <label>Test String</label>
+                    <input type="text" id="slicing-string" value="COMPUTER" maxlength="12" oninput="updateSlicing()" style="background: rgba(0,0,0,0.4); border: 1px solid var(--border-color); color: #fff; padding: 0.65rem; border-radius: 10px;">
+                  </div>
+                  <div class="slice-grid" id="slicing-grid"></div>
+                  <div class="slice-inputs">
+                    <div class="config-control">
+                      <label>Start</label>
+                      <input type="number" id="slice-start" value="3" oninput="updateSlicing()" style="background: rgba(0,0,0,0.4); border: 1px solid var(--border-color); color: #fff; padding: 0.65rem; border-radius: 10px;">
+                    </div>
+                    <div class="config-control">
+                      <label>Stop</label>
+                      <input type="number" id="slice-stop" value="6" oninput="updateSlicing()" style="background: rgba(0,0,0,0.4); border: 1px solid var(--border-color); color: #fff; padding: 0.65rem; border-radius: 10px;">
+                    </div>
+                    <div class="config-control">
+                      <label>Step</label>
+                      <input type="number" id="slice-step" value="1" oninput="updateSlicing()" style="background: rgba(0,0,0,0.4); border: 1px solid var(--border-color); color: #fff; padding: 0.65rem; border-radius: 10px;">
+                    </div>
+                  </div>
+                  <div class="code-block" id="slicing-code-out">"COMPUTER"[3:6:1]</div>
+                  <div style="font-size: 0.95rem;">Result: <span id="slicing-result" style="color: var(--success); font-weight: 700;">"PUT"</span></div>
+                </div>
+              </div>
+              <div class="console-panel" id="console-ch1">
+                <div class="console-line"><span class="console-input-prefix">&gt;&gt;&gt;</span> Slicing helper initialized. Try changing the input fields.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="chapter-view" id="ch-2">
+          <div class="notes-column">
+            <div class="section-card" data-shape-mask>
+              <h2>Functions</h2>
+              <p>Structure your programs by dividing code logic into modular, reusable blocks of execution.</p>
+              
+              <div class="tab-container">
+                <button class="tab-btn active" onclick="switchTab(this, 'ch2-need')">Need & Types</button>
+                <button class="tab-btn" onclick="switchTab(this, 'ch2-params')">Parameters</button>
+                <button class="tab-btn" onclick="switchTab(this, 'ch2-scope')">Scope & Lambda</button>
+                <button class="tab-btn" onclick="switchTab(this, 'ch2-recursion')">Recursion</button>
+              </div>
+
+              <div class="tab-content active" id="ch2-need">
+                <h3>Need for Functions</h3>
+                <p>Boilerplate code is hard to read and debug. Functions partition programs, providing:</p>
+                <ul>
+                  <li><strong>Modularity:</strong> Divide a complex project into smaller, manageable, and readable sub-tasks.</li>
+                  <li><strong>Reusability:</strong> Define execution logic once, then call it from multiple modules without duplicating code.</li>
+                  <li><strong>Isolated Namespaces:</strong> Localize variables, preventing naming conflicts across modules.</li>
+                </ul>
+                <h3>Types of Functions</h3>
+                <ul>
+                  <li><strong>Built-in:</strong> Functions available natively in the language runtime namespace (e.g. <code>len()</code>, <code>range()</code>, <code>print()</code>).</li>
+                  <li><strong>Module-based:</strong> Stored inside standard library files, requiring imports (e.g., <code>math.sqrt()</code>, <code>random.randint()</code>).</li>
+                  <li><strong>User-defined:</strong> Created by developers using the <code>def</code> keyword.</li>
+                </ul>
+              </div>
+
+              <div class="tab-content" id="ch2-params">
+                <h3>Arguments and Parameter Rules</h3>
+                <p>Parameters act as formal placeholders in a function definition, while arguments are the actual values passed during a function call.</p>
+                <ul>
+                  <li><strong>Positional Arguments:</strong> Arguments map to parameters in order, from left to right.</li>
+                  <li><strong>Default Parameters:</strong> Pre-assign fallback values to parameters. <em>Rule:</em> Default parameters must be declared after all non-default parameters. E.g., <code>def db_connect(host, port=3306)</code> is legal, but <code>def db_connect(port=3306, host)</code> is illegal.</li>
+                  <li><strong>Keyword Arguments:</strong> Let callers pass values using parameter names, allowing them to change the order. E.g., <code>db_connect(port=3306, host="127.0.0.1")</code>.</li>
+                  <li><strong>Variable-length Arguments:</strong>
+                    <ul>
+                      <li><code>*args</code>: Packs extra positional arguments into a tuple.</li>
+                      <li><code>**kwargs</code>: Packs extra keyword arguments into a dictionary.</li>
+                    </ul>
+                  </li>
+                </ul>
+              </div>
+
+              <div class="tab-content" id="ch2-scope">
+                <h3>Variable Scoping Rules</h3>
+                <p>Scope defines the accessibility of variables inside different regions of a program:</p>
+                <ul>
+                  <li><strong>Local Scope:</strong> Created inside a function body. Accessible only within that function and destroyed on return.</li>
+                  <li><strong>Global Scope:</strong> Variables declared outside all function blocks. Accessible throughout the module.</li>
+                  <li><strong>The global Keyword:</strong> Declared inside a function to allow modifying a variable in the global scope. E.g., <code>global counter</code>.</li>
+                  <li><strong>Lifetime:</strong> The period of time a variable occupies memory. Local variables exist only during function execution, whereas global variables persist until the script finishes.</li>
+                </ul>
+                <h3>Lambda Functions</h3>
+                <p>Lambda functions are small, anonymous, single-expression functions: <code>lambda arg1, arg2: expression</code>. They are useful as quick callbacks or inputs to functions like <code>map()</code> or <code>filter()</code>.</p>
+              </div>
+
+              <div class="tab-content" id="ch2-recursion">
+                <h3>Recursion Concepts</h3>
+                <p>Recursion is a programming technique where a function solves a problem by calling itself with modified inputs.</p>
+                <ul>
+                  <li><strong>Base Case:</strong> The termination condition that returns a value directly without making further recursive calls, preventing infinite loops.</li>
+                  <li><strong>Recursive Case:</strong> The step where the function calls itself with modified parameters, moving closer to the base case.</li>
+                </ul>
+                <div class="code-block">def fibonacci(n):
+    if n <= 1:
+        return n
+    return fibonacci(n-1) + fibonacci(n-2)</div>
+              </div>
+
+              <div class="quiz-card" id="quiz-ch2">
+                <div class="quiz-question">What is returned by a function that has no return statement?</div>
+                <div class="quiz-options">
+                  <div class="quiz-option" onclick="checkQuiz(this, 'incorrect', 'quiz-ch2-fb', 'Incorrect. 0 is a numeric literal. Python returns a special object.')">0</div>
+                  <div class="quiz-option" onclick="checkQuiz(this, 'correct', 'quiz-ch2-fb', 'Correct! Python implicitly returns None when a return statement is absent.')">None</div>
+                  <div class="quiz-option" onclick="checkQuiz(this, 'incorrect', 'quiz-ch2-fb', 'Incorrect. Python does not raise errors for missing returns.')">Void Error</div>
+                </div>
+                <div class="quiz-feedback" id="quiz-ch2-fb"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="interactive-column">
+            <div class="widget-panel" data-shape-mask>
+              <div class="widget-header">
+                <span class="widget-title">Recursion Stack Visualizer</span>
+                <span class="widget-badge">LIVE MODULE</span>
+              </div>
+              <div class="widget-content">
+                <div class="config-control">
+                  <label>Input Parameter (n)</label>
+                  <input type="number" id="recursion-n" value="4" min="1" max="6" style="background: rgba(0,0,0,0.4); border: 1px solid var(--border-color); color: #fff; padding: 0.65rem; border-radius: 10px;">
+                </div>
+                <div class="stack-frame-container" id="recursion-stack-view"></div>
+                <div style="display: flex; gap: 0.5rem; width: 100%;">
+                  <div class="liquid-metal-btn" onclick="startRecursion()">
+                    <div class="outline"><span class="btn-text">Simulate</span></div>
+                  </div>
+                  <div class="liquid-metal-btn" onclick="nextRecursionStep()" id="rec-step-btn-wrapper" style="pointer-events: none; opacity: 0.5;">
+                    <div class="outline"><span class="btn-text">Next Step</span></div>
+                  </div>
+                </div>
+              </div>
+              <div class="console-panel" id="console-ch2">
+                <div class="console-line"><span class="console-input-prefix">&gt;&gt;&gt;</span> Click Simulate to trace factorial evaluation stack frame allocation.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="chapter-view" id="ch-3">
+          <div class="notes-column">
+            <div class="section-card" data-shape-mask>
+              <h2>Exception Handling</h2>
+              <p>Catch runtime errors to build resilient, crash-proof programs.</p>
+              
+              <div class="tab-container">
+                <button class="tab-btn active" onclick="switchTab(this, 'ch3-errors')">Errors vs Exceptions</button>
+                <button class="tab-btn" onclick="switchTab(this, 'ch3-try')">Try-Except Flow</button>
+                <button class="tab-btn" onclick="switchTab(this, 'ch3-builtins')">Built-ins & Custom</button>
+              </div>
+
+              <div class="tab-content active" id="ch3-errors">
+                <h3>Errors vs Exceptions</h3>
+                <ul>
+                  <li><strong>Syntax Errors:</strong> Violations of Python's language rules, caught by the parser before the script runs. Prevents execution (e.g. missing colon).</li>
+                  <li><strong>Runtime Errors (Exceptions):</strong> Errors detected during execution, interrupting normal program flow (e.g., dividing by zero, passing invalid types).</li>
+                  <li><strong>Logical Errors:</strong> Semantic bugs where the program runs without crashing but produces incorrect results.</li>
+                </ul>
+                <h3>Need for Exception Handling</h3>
+                <p>Uncaught exceptions terminate programs, causing crashes. Exception handling allows a program to catch these errors and recover gracefully, log diagnostics, or clean up system resources.</p>
+              </div>
+
+              <div class="tab-content" id="ch3-try">
+                <h3>The Control Flow</h3>
+                <p>Python manages exceptions using four structured blocks:</p>
+                <ul>
+                  <li><strong>try:</strong> Contains the block of code to be monitored for exceptions.</li>
+                  <li><strong>except:</strong> Contains exception handler logic. Matches the type of exception raised in the <code>try</code> block. Multiple except blocks can be chained to handle different exception types.</li>
+                  <li><strong>else:</strong> Runs only if the code in the <code>try</code> block executes successfully without raising any exceptions.</li>
+                  <li><strong>finally:</strong> Always runs, regardless of whether an exception was raised or handled. Useful for cleanup actions like closing database connections or files.</li>
+                </ul>
+              </div>
+
+              <div class="tab-content" id="ch3-builtins">
+                <h3>Common Built-ins & Custom Types</h3>
+                <ul>
+                  <li><strong>ZeroDivisionError:</strong> Division or modulo operation with a zero denominator.</li>
+                  <li><strong>ValueError:</strong> Raised when a function receives an argument of the correct type but an inappropriate value (e.g. <code>int("abc")</code>).</li>
+                  <li><strong>TypeError:</strong> Mismatched operation types (e.g. adding a string to an integer).</li>
+                  <li><strong>IndexError:</strong> Subscript index out of range for a sequence.</li>
+                  <li><strong>KeyError:</strong> Key not found in a dictionary.</li>
+                  <li><strong>NameError:</strong> Accessing an undefined variable name.</li>
+                  <li><strong>FileNotFoundError:</strong> Trying to open a file that does not exist.</li>
+                  <li><strong>The raise statement:</strong> Manually triggers an exception. E.g., <code>raise ValueError("Limit exceeded")</code>.</li>
+                  <li><strong>User-defined Exceptions:</strong> Custom exceptions created by subclassing the base <code>Exception</code> class: <code>class CustomError(Exception): pass</code>.</li>
+                </ul>
+              </div>
+
+              <div class="quiz-card" id="quiz-ch3">
+                <div class="quiz-question">Which block in exception handling is guaranteed to run even if an exception occurs?</div>
+                <div class="quiz-options">
+                  <div class="quiz-option" onclick="checkQuiz(this, 'incorrect', 'quiz-ch3-fb', 'Incorrect. The else block only runs if NO exception occurs.')">else</div>
+                  <div class="quiz-option" onclick="checkQuiz(this, 'correct', 'quiz-ch3-fb', 'Correct! The finally block always executes regardless of the outcome.')">finally</div>
+                  <div class="quiz-option" onclick="checkQuiz(this, 'incorrect', 'quiz-ch3-fb', 'Incorrect. The except block only runs if an exception occurs.')">except</div>
+                </div>
+                <div class="quiz-feedback" id="quiz-ch3-fb"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="interactive-column">
+            <div class="widget-panel" data-shape-mask>
+              <div class="widget-header">
+                <span class="widget-title">Exception Flow Simulator</span>
+                <span class="widget-badge">LIVE MODULE</span>
+              </div>
+              <div class="widget-content">
+                <div style="margin-bottom: 0.5rem;">Select simulated inputs for:</div>
+                <div class="code-block" style="padding: 0.5rem; margin: 0 0 1rem 0;">
+                  y = 10 / int(input_val)
+                </div>
+                <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem; width: 100%;">
+                  <div class="liquid-metal-btn" onclick="runExceptionFlow('2')">
+                    <div class="outline"><span class="btn-text">Input: "2"</span></div>
+                  </div>
+                  <div class="liquid-metal-btn" onclick="runExceptionFlow('0')">
+                    <div class="outline"><span class="btn-text">Input: "0"</span></div>
+                  </div>
+                  <div class="liquid-metal-btn" onclick="runExceptionFlow('abc')">
+                    <div class="outline"><span class="btn-text">Input: "abc"</span></div>
+                  </div>
+                </div>
+                <div class="flow-step-container">
+                  <div class="flow-line" id="flow-try">try: y = 10 / int(input_val)</div>
+                  <div class="flow-line" id="flow-exc-zero">except ZeroDivisionError: print("Division by Zero")</div>
+                  <div class="flow-line" id="flow-exc-val">except ValueError: print("Invalid Value")</div>
+                  <div class="flow-line" id="flow-else">else: print("Calculation Success")</div>
+                  <div class="flow-line" id="flow-finally">finally: print("Clean Up Assets")</div>
+                </div>
+              </div>
+              <div class="console-panel" id="console-ch3">
+                <div class="console-line"><span class="console-input-prefix">&gt;&gt;&gt;</span> Click an input button to run the flow visualization.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="chapter-view" id="ch-4">
+          <div class="notes-column">
+            <div class="section-card" data-shape-mask>
+              <h2>File Handling</h2>
+              <p>Save and read persistent data files in text, binary, and CSV formats.</p>
+              
+              <div class="tab-container">
+                <button class="tab-btn active" onclick="switchTab(this, 'ch4-text')">Text Files</button>
+                <button class="tab-btn" onclick="switchTab(this, 'ch4-binary')">Binary Files</button>
+                <button class="tab-btn" onclick="switchTab(this, 'ch4-csv')">CSV Files</button>
+                <button class="tab-btn" onclick="switchTab(this, 'ch4-pointer')">File Pointer</button>
+              </div>
+
+              <div class="tab-content active" id="ch4-text">
+                <h3>Text Files</h3>
+                <p>Text files store characters line by line, terminated by an EOL (End of Line) character. Python uses the built-in <code>open()</code> function to open them.</p>
+                <ul>
+                  <li><strong>Modes:</strong> 
+                    <ul>
+                      <li><code>r</code>: Read-only (default). File must exist.</li>
+                      <li><code>w</code>: Write-only. Overwrites if file exists, creates it if not.</li>
+                      <li><code>a</code>: Append. Writes data to the end of the file.</li>
+                      <li><code>r+</code> / <code>w+</code> / <code>a+</code>: Open file for both reading and writing.</li>
+                    </ul>
+                  </li>
+                  <li><strong>Reading:</strong> <code>read(n)</code> (reads n bytes/chars), <code>readline()</code> (reads one line), <code>readlines()</code> (returns a list of all lines).</li>
+                  <li><strong>Writing:</strong> <code>write(string)</code> (writes string data), <code>writelines(list)</code> (writes a list of strings).</li>
+                  <li><strong>Context Manager:</strong> The <code>with</code> statement automatically closes files upon exiting the block, ensuring safe handle release.</li>
+                </ul>
+              </div>
+
+              <div class="tab-content" id="ch4-binary">
+                <h3>Binary Files</h3>
+                <p>Binary files store raw bytes, matching the representation of data in memory. Opened using modes <code>rb</code>, <code>wb</code>, and <code>ab</code>.</p>
+                <ul>
+                  <li><strong>The pickle Module:</strong> Used to serialize (convert python objects into byte streams) and deserialize data.</li>
+                  <li><code>pickle.dump(obj, file)</code>: Serializes and writes data structures to a binary file.</li>
+                  <li><code>pickle.load(file)</code>: Reads and deserializes data, reconstructing the original python object.</li>
+                  <li><strong>Why Binary Mode?</strong> Preserves complex data types (like nested lists, dictionaries, or custom classes) without converting them to text strings.</li>
+                </ul>
+              </div>
+
+              <div class="tab-content" id="ch4-csv">
+                <h3>CSV Files</h3>
+                <p>Comma-Separated Values are managed using Python's built-in <code>csv</code> module, designed to parse structured row-based records.</p>
+                <ul>
+                  <li><code>csv.reader(file)</code>: Returns an iterator that parses each line of the CSV file into a list of strings.</li>
+                  <li><code>csv.writer(file)</code>: Returns a writer object that writes list data into comma-separated rows.</li>
+                  <li><code>csv.DictReader(file)</code>: Maps the columns in each row to a dictionary, using the headers in the first line as keys.</li>
+                  <li><code>csv.DictWriter(file)</code>: Writes dictionaries to rows, matching fields against a predefined list of column headers.</li>
+                  <li><strong>Delimiters:</strong> Custom delimiters can be specified during reader/writer creation: <code>csv.writer(f, delimiter=';')</code>.</li>
+                </ul>
+              </div>
+
+              <div class="tab-content" id="ch4-pointer">
+                <h3>File Pointer Manipulation</h3>
+                <p>Python tracks the current position in a file using a cursor called the file pointer.</p>
+                <ul>
+                  <li><code>tell()</code>: Returns an integer indicating the current position of the file pointer (in bytes from the start).</li>
+                  <li><code>seek(offset, whence)</code>: Moves the file pointer by <code>offset</code> bytes relative to <code>whence</code>:
+                    <ul>
+                      <li><code>whence = 0</code>: Offset calculated relative to the start of the file.</li>
+                      <li><code>whence = 1</code>: Offset calculated relative to the current cursor position.</li>
+                      <li><code>whence = 2</code>: Offset calculated relative to the end of the file.</li>
+                    </ul>
+                  </li>
+                </ul>
+              </div>
+
+              <div class="quiz-card" id="quiz-ch4">
+                <div class="quiz-question">Which method is used to write Python object hierarchies to a binary file?</div>
+                <div class="quiz-options">
+                  <div class="quiz-option" onclick="checkQuiz(this, 'incorrect', 'quiz-ch4-fb', 'Incorrect. pickle.load is used to read data from binary files.')">pickle.load()</div>
+                  <div class="quiz-option" onclick="checkQuiz(this, 'correct', 'quiz-ch4-fb', 'Correct! pickle.dump serializes objects to file streams.')">pickle.dump()</div>
+                  <div class="quiz-option" onclick="checkQuiz(this, 'incorrect', 'quiz-ch4-fb', 'Incorrect. write() is for text files.')">write()</div>
+                </div>
+                <div class="quiz-feedback" id="quiz-ch4-fb"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="interactive-column">
+            <div class="widget-panel" data-shape-mask>
+              <div class="widget-header">
+                <span class="widget-title">File Pointer Simulator</span>
+                <span class="widget-badge">LIVE MODULE</span>
+              </div>
+              <div class="widget-content">
+                <div class="file-stream-visualizer">
+                  <div class="stream-meta">
+                    <span>Virtual File Buffer</span>
+                    <span>Pointer: <strong id="stream-pointer-val">0</strong></span>
+                  </div>
+                  <div class="stream-buffer" id="stream-buffer-container"></div>
+                  
+                  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+                    <div class="config-control">
+                      <label>Seek Offset</label>
+                      <input type="number" id="seek-offset" value="4" style="background: rgba(0,0,0,0.4); border: 1px solid var(--border-color); color: #fff; padding: 0.65rem; border-radius: 10px;">
+                    </div>
+                    <div class="config-control">
+                      <label>Whence</label>
+                      <select id="seek-whence" style="background: rgba(0,0,0,0.4); border: 1px solid var(--border-color); color: #fff; padding: 0.65rem; border-radius: 10px;">
+                        <option value="0">0 (Start)</option>
+                        <option value="1">1 (Current)</option>
+                        <option value="2">2 (End)</option>
+                      </select>
+                    </div>
+                  </div>
+                  
+                  <div style="display: flex; gap: 0.5rem; width: 100%;">
+                    <div class="liquid-metal-btn" onclick="executeSeek()">
+                      <div class="outline"><span class="btn-text">seek()</span></div>
+                    </div>
+                    <div class="liquid-metal-btn" onclick="executeRead(4)">
+                      <div class="outline"><span class="btn-text">read(4)</span></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="console-panel" id="console-ch4">
+                <div class="console-line"><span class="console-input-prefix">&gt;&gt;&gt;</span> File stream opened. Size: 24 bytes.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="chapter-view" id="ch-5">
+          <div class="notes-column">
+            <div class="section-card" data-shape-mask>
+              <h2>Data Structures</h2>
+              <p>Implement stacks and queues using standard Python list operations.</p>
+              
+              <div class="tab-container">
+                <button class="tab-btn active" onclick="switchTab(this, 'ch5-stack')">Stacks (LIFO)</button>
+                <button class="tab-btn" onclick="switchTab(this, 'ch5-queue')">Queues (FIFO)</button>
+                <button class="tab-btn" onclick="switchTab(this, 'ch5-list')">List Implementations</button>
+              </div>
+
+              <div class="tab-content active" id="ch5-stack">
+                <h3>Stack Data Structure</h3>
+                <p>A stack is a linear collection of elements that follows the <strong>LIFO (Last In First Out)</strong> principle. The last element added is the first one removed.</p>
+                <ul>
+                  <li><strong>Push:</strong> Inserts an element onto the top of the stack.</li>
+                  <li><strong>Pop:</strong> Removes and returns the top element. Trying to pop from an empty stack causes an Underflow error.</li>
+                  <li><strong>Peek/Top:</strong> Returns the value of the top element without removing it.</li>
+                  <li><strong>Applications:</strong> Expression parser evaluation, undo/redo buffers, and search backtracking (DFS).</li>
+                </ul>
+              </div>
+
+              <div class="tab-content" id="ch5-queue">
+                <h3>Queue Data Structure</h3>
+                <p>A queue is a linear collection that follows the <strong>FIFO (First In First Out)</strong> principle. The first element added is the first one removed.</p>
+                <ul>
+                  <li><strong>Enqueue:</strong> Inserts an element at the rear of the queue.</li>
+                  <li><strong>Dequeue:</strong> Removes and returns the element at the front.</li>
+                  <li><strong>Applications:</strong> Print buffers, cpu task dispatching queues, and graph traversals (BFS).</li>
+                </ul>
+              </div>
+
+              <div class="tab-content" id="ch5-list">
+                <h3>List-Based Implementation</h3>
+                <p>We can simulate stacks and queues using standard Python lists:</p>
+                <div class="code-block">stack = []
+stack.append(10)
+val = stack.pop()
+
+queue = []
+queue.append(20)
+val = queue.pop(0)</div>
+              </div>
+
+              <div class="quiz-card" id="quiz-ch5">
+                <div class="quiz-question">Which list operations simulate Enqueue and Dequeue respectively?</div>
+                <div class="quiz-options">
+                  <div class="quiz-option" onclick="checkQuiz(this, 'incorrect', 'quiz-ch5-fb', 'Incorrect. append() and pop() simulate stack push and pop.')">append() and pop()</div>
+                  <div class="quiz-option" onclick="checkQuiz(this, 'correct', 'quiz-ch5-fb', 'Correct! append() adds to the end, while pop(0) removes from the front.')">append() and pop(0)</div>
+                  <div class="quiz-option" onclick="checkQuiz(this, 'incorrect', 'quiz-ch5-fb', 'Incorrect. insert(0) is slow and non-standard for queues.')">insert(0) and pop()</div>
+                </div>
+                <div class="quiz-feedback" id="quiz-ch5-fb"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="interactive-column">
+            <div class="widget-panel" data-shape-mask>
+              <div class="widget-header">
+                <span class="widget-title">Stack & Queue Visualizer</span>
+                <span class="widget-badge">LIVE MODULE</span>
+              </div>
+              <div class="widget-content">
+                <div class="config-control">
+                  <label>Value input</label>
+                  <input type="text" id="struct-input" value="TX-99" maxlength="6" style="background: rgba(0,0,0,0.4); border: 1px solid var(--border-color); color: #fff; padding: 0.65rem; border-radius: 10px;">
+                </div>
+                
+                <div class="data-struct-visualizer">
+                  <div class="struct-container">
+                    <span class="struct-label">LIFO Stack</span>
+                    <div class="stack-visual-list" id="stack-items-list"></div>
+                  </div>
+                  <div class="struct-container">
+                    <span class="struct-label">FIFO Queue</span>
+                    <div class="queue-visual-list" id="queue-items-list"></div>
+                  </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; width: 100%;">
+                  <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                    <div class="liquid-metal-btn" onclick="pushStack()">
+                      <div class="outline"><span class="btn-text">Push</span></div>
+                    </div>
+                    <div class="liquid-metal-btn" onclick="popStack()">
+                      <div class="outline"><span class="btn-text">Pop</span></div>
+                    </div>
+                  </div>
+                  <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                    <div class="liquid-metal-btn" onclick="enqueueQueue()">
+                      <div class="outline"><span class="btn-text">Enqueue</span></div>
+                    </div>
+                    <div class="liquid-metal-btn" onclick="dequeueQueue()">
+                      <div class="outline"><span class="btn-text">Dequeue</span></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="console-panel" id="console-ch5">
+                <div class="console-line"><span class="console-input-prefix">&gt;&gt;&gt;</span> Data structure buffers initialized.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="chapter-view" id="ch-6">
+          <div class="notes-column">
+            <div class="section-card" data-shape-mask>
+              <h2>Computer Networks</h2>
+              <p>A comprehensive overview of network scales, physical topologies, active protocols, devices, security threats, and regulations.</p>
+              
+              <div class="tab-container">
+                <button class="tab-btn active" onclick="switchTab(this, 'ch6-types')">Types & Topo</button>
+                <button class="tab-btn" onclick="switchTab(this, 'ch6-devices')">Devices & Media</button>
+                <button class="tab-btn" onclick="switchTab(this, 'ch6-protocols')">Protocols</button>
+                <button class="tab-btn" onclick="switchTab(this, 'ch6-security')">Security & Cyber</button>
+              </div>
+
+              <div class="tab-content active" id="ch6-types">
+                <h3>Types of Networks</h3>
+                <p>Networks scale by geographic coverage, defining unique performance ranges:</p>
+                <ul>
+                  <li><strong>PAN (Personal Area Network):</strong> Interconnects devices close to a person (range: 1-10 meters). E.g. Bluetooth mouse, wireless headphones.</li>
+                  <li><strong>LAN (Local Area Network):</strong> Covers small physical locations like offices, schools, or homes. Typically operates via Ethernet or Wi-Fi.</li>
+                  <li><strong>MAN (Metropolitan Area Network):</strong> Covers larger geographic areas like towns or cities (e.g. cable TV networks).</li>
+                  <li><strong>WAN (Wide Area Network):</strong> Links distant regions across countries or continents. The Internet is the largest global WAN.</li>
+                </ul>
+                <h3>Network Topologies</h3>
+                <p>Topologies define the layout of links and nodes in a network:</p>
+                <ul>
+                  <li><strong>Bus:</strong> Nodes share a single central backbone cable. If the backbone breaks, the entire network fails.</li>
+                  <li><strong>Star:</strong> Nodes connect to a central hub or switch. Highly reliable (one node failure doesn't affect others), but vulnerable to central switch failures.</li>
+                  <li><strong>Ring:</strong> Nodes form a circular loop, passing data tokens sequentially. A single node failure interrupts the whole ring.</li>
+                  <li><strong>Mesh:</strong> Nodes connect directly to each other. Highly redundant, reliable, and secure, but complex and expensive to configure.</li>
+                  <li><strong>Tree:</strong> A hierarchical combination of star and bus layouts, common in structured corporate LAN networks.</li>
+                </ul>
+              </div>
+
+              <div class="tab-content" id="ch6-devices">
+                <h3>Hardware Devices</h3>
+                <ul>
+                  <li><strong>Modem (Modulator-Demodulator):</strong> Converts digital signals from a computer to analog signals for telephone lines, and vice versa.</li>
+                  <li><strong>Hub:</strong> A basic Layer-1 device that broadcasts incoming packets to all physical ports.</li>
+                  <li><strong>Switch:</strong> A Layer-2 device that reads MAC addresses to send packets only to their target destination, saving bandwidth.</li>
+                  <li><strong>Repeater:</strong> Amplifies signals to prevent packet loss over long physical distances.</li>
+                  <li><strong>Router:</strong> A Layer-3 device that forwards packets across different networks using IP routing tables.</li>
+                  <li><strong>Gateway:</strong> Connects networks that use different underlying protocols or architectures.</li>
+                </ul>
+                <h3>Transmission Media</h3>
+                <ul>
+                  <li><strong>Wired Media:</strong> Twisted Pair (STP/UTP), Coaxial cables (TV feeds), and Fiber Optic cables (transmits light signals through glass threads, immune to electromagnetic interference).</li>
+                  <li><strong>Wireless Media:</strong> Radio waves, microwaves, satellites (global line-of-sight), and infrared (short-range line-of-sight, e.g. remote controls).</li>
+                </ul>
+              </div>
+
+              <div class="tab-content" id="ch6-protocols">
+                <h3>Communication Protocols</h3>
+                <ul>
+                  <li><strong>TCP/IP:</strong> The core protocol suite of the Internet. TCP handles packet construction, sizing, and reliability, while IP manages addressing.</li>
+                  <li><strong>HTTP / HTTPS:</strong> Delivers web resources. HTTPS is encrypted using SSL/TLS protocols.</li>
+                  <li><strong>FTP:</strong> Used to transfer files between client and server systems.</li>
+                  <li><strong>PPP (Point-to-Point Protocol):</strong> Establishes a direct connection between two nodes (e.g. modem to ISP).</li>
+                  <li><strong>SMTP:</strong> Sends email messages, while <strong>POP3</strong> handles downloading emails from mail servers.</li>
+                </ul>
+              </div>
+
+              <div class="tab-content" id="ch6-security">
+                <h3>Network Security & Cyber Law</h3>
+                <ul>
+                  <li><strong>Firewall:</strong> Monitors and filters incoming network packets based on predefined security rules.</li>
+                  <li><strong>Malware:</strong> Malicious software, including:
+                    <ul>
+                      <li><strong>Viruses:</strong> Attach to host files and run when the host is executed.</li>
+                      <li><strong>Worms:</strong> Self-replicating programs that spread across networks, consuming bandwidth.</li>
+                      <li><strong>Trojan Horses:</strong> Disguised as safe files, they create backdoors for unauthorized access.</li>
+                      <li><strong>Spam:</strong> Unsolicited bulk email messages.</li>
+                    </ul>
+                  </li>
+                  <li><strong>Cyber Crime & Law:</strong> The Indian IT Act 2000 provides the legal framework for cyber offenses like phishing (identity theft), hacking, and software piracy.</li>
+                  <li><strong>Web Services:</strong> Includes IoT (Internet of Things) and cloud computing (SaaS, PaaS, IaaS).</li>
+                </ul>
+              </div>
+
+              <div class="quiz-card" id="quiz-ch6">
+                <div class="quiz-question">Which device uses MAC addresses to forward packets to specific devices?</div>
+                <div class="quiz-options">
+                  <div class="quiz-option" onclick="checkQuiz(this, 'incorrect', 'quiz-ch6-fb', 'Incorrect. A hub broadcasts to all ports blindly.')">Hub</div>
+                  <div class="quiz-option" onclick="checkQuiz(this, 'correct', 'quiz-ch6-fb', 'Correct! A switch routes packets to specific ports using MAC addresses.')">Switch</div>
+                  <div class="quiz-option" onclick="checkQuiz(this, 'incorrect', 'quiz-ch6-fb', 'Incorrect. A router forwards packets based on IP addresses.')">Router</div>
+                </div>
+                <div class="quiz-feedback" id="quiz-ch6-fb"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="interactive-column">
+            <div class="widget-panel" data-shape-mask>
+              <div class="widget-header">
+                <span class="widget-title">Topology Link Router</span>
+                <span class="widget-badge">LIVE MODULE</span>
+              </div>
+              <div class="widget-content">
+                <div class="config-control">
+                  <label>Select Topology</label>
+                  <select id="network-topology-select" onchange="changeTopology()" style="background: rgba(0,0,0,0.4); border: 1px solid var(--border-color); color: #fff; padding: 0.65rem; border-radius: 10px;">
+                    <option value="star">Star Topology</option>
+                    <option value="bus">Bus Topology</option>
+                    <option value="ring">Ring Topology</option>
+                    <option value="mesh">Mesh Topology</option>
+                  </select>
+                </div>
+                <div class="topology-canvas-container">
+                  <canvas id="topology-canvas"></canvas>
+                </div>
+                <div class="liquid-metal-btn" onclick="sendNetworkPacket()">
+                  <div class="outline"><span class="btn-text">Transmit Packet</span></div>
+                </div>
+              </div>
+              <div class="console-panel" id="console-ch6">
+                <div class="console-line"><span class="console-input-prefix">&gt;&gt;&gt;</span> Network active. Click Transmit Packet to route data.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const clock = document.getElementById('terminal-clock');
+    setInterval(() => {
+      const now = new Date();
+      clock.innerText = now.toTimeString().split(' ')[0];
+    }, 1000);
+
+    const chapterViews = document.querySelectorAll('.chapter-view');
+    
+    function switchChapter(chNum) {
+      chapterViews.forEach(v => v.classList.remove('active'));
+      const chId = 'ch-' + chNum;
+      const view = document.getElementById(chId);
+      view.classList.add('active');
+      
+      const menuLinks = document.querySelectorAll('.underlay-nav__link-large');
+      menuLinks.forEach((link, idx) => {
+        if (idx + 1 === chNum) {
+          link.classList.add('w--current');
+        } else {
+          link.classList.remove('w--current');
+        }
+      });
+      
+      const contentInners = view.querySelectorAll('.notes-column .section-card');
+      gsap.fromTo(contentInners, 
+        { opacity: 0, y: 30 }, 
+        { opacity: 1, y: 0, duration: 0.6, ease: 'power3.out' }
+      );
+      
+      if (chId === 'ch-6') {
+        setTimeout(initTopology, 100);
+      }
+    }
+
+    function switchChapterFromMenu(chNum) {
+      switchChapter(chNum);
+      if (typeof toggleMenu === 'function') {
+        toggleMenu();
+      }
+    }
+
+    function switchTab(btn, contentId) {
+      const parent = btn.parentElement;
+      parent.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const container = parent.parentElement;
+      
+      const tabContents = container.querySelectorAll('.tab-content');
+      tabContents.forEach(c => {
+        if (c.id !== contentId) c.classList.remove('active');
+      });
+      const activeContent = container.querySelector('#' + contentId);
+      activeContent.classList.add('active');
+
+      const textElements = activeContent.querySelectorAll('p, li, pre, h3, .quiz-container');
+      gsap.killTweensOf(textElements);
+      gsap.fromTo(textElements, 
+        { opacity: 0, y: 15 }, 
+        { opacity: 1, y: 0, duration: 0.5, stagger: 0.04, ease: 'power2.out' }
+      );
+    }
+
+    function checkQuiz(option, status, feedbackId, msg) {
+      const options = option.parentElement.querySelectorAll('.quiz-option');
+      options.forEach(o => {
+        o.classList.remove('selected', 'correct', 'incorrect');
+        o.style.pointerEvents = 'none';
+      });
+      const feedback = document.getElementById(feedbackId);
+      feedback.style.display = 'block';
+      if (status === 'correct') {
+        option.classList.add('correct');
+        feedback.innerText = 'SUCCESS: ' + msg;
+        feedback.className = 'quiz-feedback console-text-success';
+      } else {
+        option.classList.add('incorrect');
+        feedback.innerText = 'ERROR: ' + msg;
+        feedback.className = 'quiz-feedback console-text-error';
+      }
+    }
+
+    function updateSlicing() {
+      const str = document.getElementById('slicing-string').value || "PYTHON";
+      const startVal = document.getElementById('slice-start').value;
+      const stopVal = document.getElementById('slice-stop').value;
+      const stepVal = document.getElementById('slice-step').value;
+      const start = startVal !== "" ? parseInt(startVal) : null;
+      const stop = stopVal !== "" ? parseInt(stopVal) : null;
+      const step = stepVal !== "" ? parseInt(stepVal) : 1;
+      const grid = document.getElementById('slicing-grid');
+      grid.innerHTML = '';
+      const len = str.length;
+      let rangeStart = start !== null ? (start < 0 ? len + start : start) : 0;
+      let rangeStop = stop !== null ? (stop < 0 ? len + stop : stop) : len;
+      let indices = [];
+      if (step > 0) {
+        for (let i = rangeStart; i < rangeStop; i += step) {
+          if (i >= 0 && i < len) indices.push(i);
+        }
+      } else if (step < 0) {
+        for (let i = rangeStart; i > rangeStop; i += step) {
+          if (i >= 0 && i < len) indices.push(i);
+        }
+      }
+      let result = '';
+      for (let idx of indices) {
+        result += str[idx];
+      }
+      document.getElementById('slicing-result').innerText = `"${result}"`;
+      document.getElementById('slicing-code-out').innerText = `"${str}"[${startVal}:${stopVal}:${stepVal}]`;
+      for (let i = 0; i < len; i++) {
+        const cell = document.createElement('div');
+        cell.className = 'slice-cell';
+        if (indices.includes(i)) cell.classList.add('selected');
+        const negIdx = i - len;
+        cell.innerHTML = `
+          <span class="slice-idx-top">${i}</span>
+          <span class="slice-char">${str[i]}</span>
+          <span class="slice-idx-bot">${negIdx}</span>
+        `;
+        grid.appendChild(cell);
+      }
+      const consoleCh1 = document.getElementById('console-ch1');
+      consoleCh1.innerHTML = `
+        <div class="console-line"><span class="console-input-prefix">&gt;&gt;&gt;</span> str = "${str}"</div>
+        <div class="console-line"><span class="console-input-prefix">&gt;&gt;&gt;</span> str[${startVal}:${stopVal}:${stepVal}]</div>
+        <div class="console-line console-text-success">'${result}'</div>
+      `;
+    }
+    updateSlicing();
+
+    let recursionSteps = [];
+    let recursionCurrentStep = 0;
+    function startRecursion() {
+      const n = parseInt(document.getElementById('recursion-n').value) || 4;
+      recursionSteps = [];
+      recursionCurrentStep = 0;
+      function fact(val) {
+        recursionSteps.push({ type: 'push', val: val });
+        if (val <= 1) {
+          recursionSteps.push({ type: 'return', val: val, ret: 1 });
+          return 1;
+        }
+        const sub = fact(val - 1);
+        const ans = val * sub;
+        recursionSteps.push({ type: 'return', val: val, ret: ans });
+        return ans;
+      }
+      fact(n);
+      const stepBtn = document.getElementById('rec-step-btn-wrapper');
+      stepBtn.style.pointerEvents = 'auto';
+      stepBtn.style.opacity = '1';
+      document.getElementById('recursion-stack-view').innerHTML = '';
+      document.getElementById('console-ch2').innerHTML = `<div class="console-line"><span class="console-input-prefix">&gt;&gt;&gt;</span> Initialized factorial(${n}) trace. Click Next Step.</div>`;
+    }
+
+    function nextRecursionStep() {
+      if (recursionCurrentStep >= recursionSteps.length) {
+        const stepBtn = document.getElementById('rec-step-btn-wrapper');
+        stepBtn.style.pointerEvents = 'none';
+        stepBtn.style.opacity = '0.5';
+        return;
+      }
+      const step = recursionSteps[recursionCurrentStep];
+      const container = document.getElementById('recursion-stack-view');
+      const consoleCh2 = document.getElementById('console-ch2');
+      if (step.type === 'push') {
+        const frame = document.createElement('div');
+        frame.className = 'stack-frame active';
+        frame.id = `frame-${step.val}`;
+        frame.innerHTML = `<span>fact(${step.val})</span><span>n = ${step.val}</span>`;
+        container.appendChild(frame);
+        consoleCh2.innerHTML += `<div class="console-line"><span class="console-input-prefix">&gt;&gt;&gt;</span> Push frame: fact(${step.val}). Waiting for subcall.</div>`;
+      } else {
+        const frame = document.getElementById(`frame-${step.val}`);
+        if (frame) {
+          frame.className = 'stack-frame returning';
+          frame.innerHTML = `<span>fact(${step.val})</span><span>returns ${step.ret}</span>`;
+          setTimeout(() => frame.remove(), 1000);
+        }
+        consoleCh2.innerHTML += `<div class="console-line console-text-success"><span class="console-input-prefix">&lt;&lt;&lt;</span> Pop frame: fact(${step.val}) returned ${step.ret}</div>`;
+      }
+      consoleCh2.scrollTop = consoleCh2.scrollHeight;
+      recursionCurrentStep++;
+    }
+
+    function runExceptionFlow(inputVal) {
+      const flowTry = document.getElementById('flow-try');
+      const flowZero = document.getElementById('flow-exc-zero');
+      const flowVal = document.getElementById('flow-exc-val');
+      const flowElse = document.getElementById('flow-else');
+      const flowFinally = document.getElementById('flow-finally');
+      const consoleCh3 = document.getElementById('console-ch3');
+      flowTry.className = 'flow-line';
+      flowZero.className = 'flow-line';
+      flowVal.className = 'flow-line';
+      flowElse.className = 'flow-line';
+      flowFinally.className = 'flow-line';
+      consoleCh3.innerHTML = `<div class="console-line"><span class="console-input-prefix">&gt;&gt;&gt;</span> Input value: "${inputVal}"</div>`;
+      setTimeout(() => {
+        flowTry.classList.add('executing');
+        consoleCh3.innerHTML += `<div class="console-line">Line 1: Entering try block. Evaluating 10 / "${inputVal}"</div>`;
+        setTimeout(() => {
+          if (inputVal === '0') {
+            flowTry.className = 'flow-line';
+            flowZero.classList.add('highlight');
+            consoleCh3.innerHTML += `<div class="console-line console-text-error">ZeroDivisionError: division by zero. Matching except ZeroDivisionError.</div>`;
+          } else if (isNaN(inputVal)) {
+            flowTry.className = 'flow-line';
+            flowVal.classList.add('highlight');
+            consoleCh3.innerHTML += `<div class="console-line console-text-error">ValueError: invalid literal for int(). Matching except ValueError.</div>`;
+          } else {
+            flowTry.className = 'flow-line';
+            flowElse.classList.add('highlight');
+            consoleCh3.innerHTML += `<div class="console-line console-text-success">Success: result = ${10 / parseInt(inputVal)}. Running else block.</div>`;
+          }
+          setTimeout(() => {
+            flowFinally.classList.add('highlight');
+            consoleCh3.innerHTML += `<div class="console-line console-text-info">Running finally block. Cleaning up resources.</div>`;
+            consoleCh3.scrollTop = consoleCh3.scrollHeight;
+          }, 800);
+        }, 800);
+      }, 100);
+    }
+
+    const virtualFileContent = "APEX_FILE_DESCRIPTOR_DATA";
+    let filePointer = 0;
+    function initFileStream() {
+      const container = document.getElementById('stream-buffer-container');
+      container.innerHTML = '';
+      for (let i = 0; i < virtualFileContent.length; i++) {
+        const byteCell = document.createElement('div');
+        byteCell.className = 'buffer-byte';
+        byteCell.id = `byte-${i}`;
+        byteCell.innerText = virtualFileContent[i];
+        container.appendChild(byteCell);
+      }
+      updateFilePointerUI();
+    }
+    function updateFilePointerUI() {
+      const cells = document.querySelectorAll('.buffer-byte');
+      cells.forEach(c => c.className = 'buffer-byte');
+      const targetCell = document.getElementById(`byte-${filePointer}`);
+      if (targetCell) {
+        targetCell.classList.add('pointer');
+      }
+      document.getElementById('stream-pointer-val').innerText = filePointer;
+    }
+    function executeSeek() {
+      const offset = parseInt(document.getElementById('seek-offset').value) || 0;
+      const whence = parseInt(document.getElementById('seek-whence').value);
+      const len = virtualFileContent.length;
+      let newPointer = filePointer;
+      if (whence === 0) {
+        newPointer = offset;
+      } else if (whence === 1) {
+        newPointer = filePointer + offset;
+      } else if (whence === 2) {
+        newPointer = len + offset;
+      }
+      if (newPointer < 0 || newPointer > len) {
+        const consoleCh4 = document.getElementById('console-ch4');
+        consoleCh4.innerHTML += `<div class="console-line console-text-error">OSError: Invalid seek argument. Pointer bounds [0, ${len}].</div>`;
+        consoleCh4.scrollTop = consoleCh4.scrollHeight;
+        return;
+      }
+      filePointer = newPointer;
+      updateFilePointerUI();
+      const consoleCh4 = document.getElementById('console-ch4');
+      consoleCh4.innerHTML += `<div class="console-line"><span class="console-input-prefix">&gt;&gt;&gt;</span> seek(${offset}, ${whence})</div>`;
+      consoleCh4.innerHTML += `<div class="console-line">Pointer moved to index ${filePointer}</div>`;
+      consoleCh4.scrollTop = consoleCh4.scrollHeight;
+    }
+    function executeRead(n) {
+      const len = virtualFileContent.length;
+      let readCount = Math.min(n, len - filePointer);
+      if (readCount <= 0) {
+        const consoleCh4 = document.getElementById('console-ch4');
+        consoleCh4.innerHTML += `<div class="console-line console-text-info">EOF: Reached end of file buffer. Output: ""</div>`;
+        consoleCh4.scrollTop = consoleCh4.scrollHeight;
+        return;
+      }
+      const cells = document.querySelectorAll('.buffer-byte');
+      for (let i = filePointer; i < filePointer + readCount; i++) {
+        const cell = document.getElementById(`byte-${i}`);
+        if (cell) cell.classList.add('read-highlight');
+      }
+      const dataRead = virtualFileContent.substring(filePointer, filePointer + readCount);
+      filePointer += readCount;
+      setTimeout(() => {
+        updateFilePointerUI();
+      }, 600);
+      const consoleCh4 = document.getElementById('console-ch4');
+      consoleCh4.innerHTML += `<div class="console-line"><span class="console-input-prefix">&gt;&gt;&gt;</span> read(${n})</div>`;
+      consoleCh4.innerHTML += `<div class="console-line console-text-success">Read: "${dataRead}" (Pointer: ${filePointer})</div>`;
+      consoleCh4.scrollTop = consoleCh4.scrollHeight;
+    }
+    initFileStream();
+
+    let stackData = ['TX-01', 'TX-02'];
+    let queueData = ['RX-01', 'RX-02'];
+    function updateDataStructUI() {
+      const stackList = document.getElementById('stack-items-list');
+      const queueList = document.getElementById('queue-items-list');
+      stackList.innerHTML = '';
+      queueList.innerHTML = '';
+      stackData.forEach(item => {
+        const el = document.createElement('div');
+        el.className = 'struct-item';
+        el.innerText = item;
+        stackList.appendChild(el);
+      });
+      queueData.forEach(item => {
+        const el = document.createElement('div');
+        el.className = 'struct-item';
+        el.innerText = item;
+        queueList.appendChild(el);
+      });
+    }
+    function pushStack() {
+      const val = document.getElementById('struct-input').value;
+      if (!val) return;
+      if (stackData.length >= 5) {
+        const consoleCh5 = document.getElementById('console-ch5');
+        consoleCh5.innerHTML += `<div class="console-line console-text-error">OverflowError: Stack is full.</div>`;
+        consoleCh5.scrollTop = consoleCh5.scrollHeight;
+        return;
+      }
+      stackData.push(val);
+      updateDataStructUI();
+      const consoleCh5 = document.getElementById('console-ch5');
+      consoleCh5.innerHTML += `<div class="console-line"><span class="console-input-prefix">&gt;&gt;&gt;</span> stack.append("${val}")</div>`;
+      consoleCh5.scrollTop = consoleCh5.scrollHeight;
+    }
+    function popStack() {
+      if (stackData.length === 0) {
+        const consoleCh5 = document.getElementById('console-ch5');
+        consoleCh5.innerHTML += `<div class="console-line console-text-error">UnderflowError: Stack is empty.</div>`;
+        consoleCh5.scrollTop = consoleCh5.scrollHeight;
+        return;
+      }
+      const val = stackData.pop();
+      updateDataStructUI();
+      const consoleCh5 = document.getElementById('console-ch5');
+      consoleCh5.innerHTML += `<div class="console-line console-text-success">stack.pop() -&gt; "${val}"</div>`;
+      consoleCh5.scrollTop = consoleCh5.scrollHeight;
+    }
+    function enqueueQueue() {
+      const val = document.getElementById('struct-input').value;
+      if (!val) return;
+      if (queueData.length >= 5) {
+        const consoleCh5 = document.getElementById('console-ch5');
+        consoleCh5.innerHTML += `<div class="console-line console-text-error">OverflowError: Queue is full.</div>`;
+        consoleCh5.scrollTop = consoleCh5.scrollHeight;
+        return;
+      }
+      queueData.push(val);
+      updateDataStructUI();
+      const consoleCh5 = document.getElementById('console-ch5');
+      consoleCh5.innerHTML += `<div class="console-line"><span class="console-input-prefix">&gt;&gt;&gt;</span> queue.append("${val}")</div>`;
+      consoleCh5.scrollTop = consoleCh5.scrollHeight;
+    }
+    function dequeueQueue() {
+      if (queueData.length === 0) {
+        const consoleCh5 = document.getElementById('console-ch5');
+        consoleCh5.innerHTML += `<div class="console-line console-text-error">UnderflowError: Queue is empty.</div>`;
+        consoleCh5.scrollTop = consoleCh5.scrollHeight;
+        return;
+      }
+      const val = queueData.shift();
+      updateDataStructUI();
+      const consoleCh5 = document.getElementById('console-ch5');
+      consoleCh5.innerHTML += `<div class="console-line console-text-success">queue.pop(0) -&gt; "${val}"</div>`;
+      consoleCh5.scrollTop = consoleCh5.scrollHeight;
+    }
+    updateDataStructUI();
+
+    let nodes = [];
+    let connections = [];
+    let packets = [];
+    let activeTopology = 'star';
+    function initTopology() {
+      const canvas = document.getElementById('topology-canvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const width = canvas.offsetWidth;
+      const height = canvas.offsetHeight;
+      canvas.width = width;
+      canvas.height = height;
+      changeTopology();
+    }
+    function changeTopology() {
+      const select = document.getElementById('network-topology-select');
+      activeTopology = select.value;
+      const canvas = document.getElementById('topology-canvas');
+      const w = canvas.width;
+      const h = canvas.height;
+      nodes = [];
+      connections = [];
+      packets = [];
+      if (activeTopology === 'star') {
+        nodes.push({ id: 0, x: w / 2, y: h / 2, role: 'Hub/Switch' });
+        const count = 5;
+        for (let i = 0; i < count; i++) {
+          const angle = (i * 2 * Math.PI) / count;
+          const px = w / 2 + 80 * Math.cos(angle);
+          const py = h / 2 + 80 * Math.sin(angle);
+          nodes.push({ id: i + 1, x: px, y: py, role: 'Client' });
+          connections.push({ from: 0, to: i + 1 });
+        }
+      } else if (activeTopology === 'bus') {
+        const backboneY = h / 2;
+        const count = 6;
+        for (let i = 0; i < count; i++) {
+          const px = 50 + (i * (w - 100)) / (count - 1);
+          const offset = i % 2 === 0 ? -50 : 50;
+          nodes.push({ id: i, x: px, y: backboneY + offset, role: 'Client' });
+          connections.push({ from: -1, to: i, bx: px, by: backboneY });
+        }
+      } else if (activeTopology === 'ring') {
+        const count = 6;
+        for (let i = 0; i < count; i++) {
+          const angle = (i * 2 * Math.PI) / count;
+          const px = w / 2 + 75 * Math.cos(angle);
+          const py = h / 2 + 75 * Math.sin(angle);
+          nodes.push({ id: i, x: px, y: py, role: 'Client' });
+        }
+        for (let i = 0; i < count; i++) {
+          connections.push({ from: i, to: (i + 1) % count });
+        }
+      } else if (activeTopology === 'mesh') {
+        const count = 5;
+        for (let i = 0; i < count; i++) {
+          const angle = (i * 2 * Math.PI) / count;
+          const px = w / 2 + 70 * Math.cos(angle);
+          const py = h / 2 + 70 * Math.sin(angle);
+          nodes.push({ id: i, x: px, y: py, role: 'Client' });
+        }
+        for (let i = 0; i < count; i++) {
+          for (let j = i + 1; j < count; j++) {
+            connections.push({ from: i, to: j });
+          }
+        }
+      }
+      drawTopology();
+    }
+    function drawTopology() {
+      const canvas = document.getElementById('topology-canvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const w = canvas.width;
+      const h = canvas.height;
+      ctx.clearRect(0, 0, w, h);
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+      if (activeTopology === 'bus') {
+        ctx.beginPath();
+        ctx.moveTo(30, h / 2);
+        ctx.lineTo(w - 30, h / 2);
+        ctx.stroke();
+        connections.forEach(c => {
+          ctx.beginPath();
+          ctx.moveTo(c.bx, h / 2);
+          ctx.lineTo(nodes[c.to].x, nodes[c.to].y);
+          ctx.stroke();
+        });
+      } else {
+        connections.forEach(c => {
+          const fromNode = nodes[c.from];
+          const toNode = nodes[c.to];
+          ctx.beginPath();
+          ctx.moveTo(fromNode.x, fromNode.y);
+          ctx.lineTo(toNode.x, toNode.y);
+          ctx.stroke();
+        });
+      }
+      nodes.forEach(n => {
+        ctx.beginPath();
+        const size = n.role === 'Hub/Switch' ? 10 : 7;
+        ctx.arc(n.x, n.y, size, 0, 2 * Math.PI);
+        ctx.fillStyle = '#fff';
+        ctx.fill();
+        ctx.strokeStyle = '#080808';
+        ctx.stroke();
+      });
+      packets.forEach(p => {
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 6, 0, 2 * Math.PI);
+        ctx.fillStyle = '#fff';
+        ctx.fill();
+      });
+    }
+    function sendNetworkPacket() {
+      if (nodes.length === 0) return;
+      packets = [];
+      const consoleCh6 = document.getElementById('console-ch6');
+      if (activeTopology === 'star') {
+        const targetIdx = 1 + Math.floor(Math.random() * (nodes.length - 1));
+        consoleCh6.innerHTML += `<div class="console-line"><span class="console-input-prefix">&gt;&gt;&gt;</span> Packet route: Client 1 -&gt; Hub/Switch -&gt; Client ${targetIdx}</div>`;
+        const c1 = nodes[1];
+        const hub = nodes[0];
+        const target = nodes[targetIdx];
+        packets.push({ x: c1.x, y: c1.y, tx: hub.x, ty: hub.y, stage: 1, targetNode: target });
+      } else if (activeTopology === 'bus') {
+        const src = 0;
+        const dest = 4;
+        consoleCh6.innerHTML += `<div class="console-line"><span class="console-input-prefix">&gt;&gt;&gt;</span> Broadcast: Client 0 transmits onto Bus trunk.</div>`;
+        packets.push({ x: nodes[src].x, y: nodes[src].y, tx: nodes[src].x, ty: canvasEl.height/2, stage: 1, destIdx: dest });
+      } else if (activeTopology === 'ring') {
+        const dest = 3;
+        consoleCh6.innerHTML += `<div class="console-line"><span class="console-input-prefix">&gt;&gt;&gt;</span> Ring Route: Hop-by-Hop transmission Node 0 -&gt; Node 3</div>`;
+        packets.push({ x: nodes[0].x, y: nodes[0].y, tx: nodes[1].x, ty: nodes[1].y, currentHop: 0, destIdx: dest });
+      } else if (activeTopology === 'mesh') {
+        const dest = 3;
+        consoleCh6.innerHTML += `<div class="console-line"><span class="console-input-prefix">&gt;&gt;&gt;</span> Dedicated Mesh Link: Direct path Node 0 -&gt; Node 3</div>`;
+        packets.push({ x: nodes[0].x, y: nodes[0].y, tx: nodes[3].x, ty: nodes[3].y, stage: 1 });
+      }
+      consoleCh6.scrollTop = consoleCh6.scrollHeight;
+    }
+
+    var gap = 42;
+    var radiusVmin = 25;
+    var speedIn = 0.45;
+    var speedOut = 3.2;
+    var restScale = 0.0;
+    var minHoverScale = 1.0;
+    var maxHoverScale = 2.8;
+    var waveSpeed = 1100;
+    var waveWidth = 170;
+
+    var PALETTE = [
+      { type: 'solid', value: '#e2e8f0' },
+      { type: 'solid', value: '#cbd5e1' },
+      { type: 'solid', value: '#94a3b8' },
+      { type: 'solid', value: '#64748b' },
+      { type: 'gradient', stops: ['#ffffff', '#94a3b8'] },
+      { type: 'gradient', stops: ['#e2e8f0', '#475569'] },
+      { type: 'gradient', stops: ['#cbd5e1', '#334155'] }
+    ];
+
+    var SHAPE_TYPES = ['circle', 'pill', 'star'];
+    var bgCanvas = document.getElementById('bg-canvas');
+    var bgCtx = bgCanvas.getContext('2d');
+    var grid = null;
+    var rafId = null;
+    var pointer = null;
+    var activity = 0;
+    var waves = [];
+    var maskRects = [];
+    var frameCount = 0;
+    var maskOverride = false;
+    var scaleMultiplier = 3.0;
+
+    var lights = [
+      { x: 0.15, y: 0.2, vx: 0.0003, vy: 0.0004, radius: 0.7, color: 'rgba(100, 150, 255, 0.04)' },
+      { x: 0.85, y: 0.75, vx: -0.0004, vy: 0.0003, radius: 0.8, color: 'rgba(255, 120, 200, 0.03)' },
+      { x: 0.5, y: 0.45, vx: 0.0002, vy: -0.0003, radius: 0.6, color: 'rgba(120, 255, 200, 0.03)' }
+    ];
+
+    function rnd(min, max) { return Math.random() * (max - min) + min; }
+    function rndInt(min, max) { return Math.floor(rnd(min, max + 1)); }
+    function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+    function smoothstep(t) {
+      var c = Math.max(0, Math.min(1, t));
+      return c * c * (3 - 2 * c);
+    }
+
+    function durationToFactor(seconds) {
+      if (seconds <= 0) return 1;
+      return 1 - Math.pow(0.05, 1 / (60 * seconds));
+    }
+
+    function drawCircle(ctx, size) {
+      ctx.beginPath();
+      ctx.arc(0, 0, size, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    function drawPill(ctx, size) {
+      var w = size * 0.48;
+      var h = size;
+      ctx.beginPath();
+      ctx.roundRect(-w, -h, w * 2, h * 2, w);
+      ctx.fill();
+    }
+
+    function drawStar(ctx, size, points, innerRatio) {
+      ctx.beginPath();
+      for (var i = 0; i < points * 2; i++) {
+        var angle = (i * Math.PI) / points - Math.PI / 2;
+        var r = i % 2 === 0 ? size : size * innerRatio;
+        var x = Math.cos(angle) * r;
+        var y = Math.sin(angle) * r;
+        i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+      }
+      ctx.closePath();
+      ctx.fill();
+    }
+
+    function drawShape(ctx, shape) {
+      switch (shape.type) {
+        case 'circle': return drawCircle(ctx, shape.size / 1.5);
+        case 'pill':   return drawPill(ctx, shape.size / 1.4);
+        case 'star':   return drawStar(ctx, shape.size, shape.points, shape.innerRatio);
+      }
+    }
+
+    function resolveFill(ctx, colorDef, size) {
+      if (colorDef.type === 'solid') return colorDef.value;
+      var grad = ctx.createRadialGradient(0, -size * 0.3, 0, 0, size * 0.3, size * 1.5);
+      grad.addColorStop(0, colorDef.stops[0]);
+      grad.addColorStop(1, colorDef.stops[1]);
+      return grad;
+    }
+
+    function randomStarProps() {
+      return {
+        points: rndInt(4, 8),
+        innerRatio: rnd(0.2, 0.45)
+      };
+    }
+
+    function buildGrid() {
+      var W = window.innerWidth;
+      var H = window.innerHeight;
+      var cols = Math.floor(W / gap);
+      var rows = Math.floor(H / gap);
+      var offsetX = (W - (cols - 1) * gap) / 2;
+      var offsetY = (H - (rows - 1) * gap) / 2;
+      var shapes = [];
+
+      for (var row = 0; row < rows; row++) {
+        for (var col = 0; col < cols; col++) {
+          var type = pick(SHAPE_TYPES);
+          var shape = {
+            x: offsetX + col * gap,
+            y: offsetY + row * gap,
+            type: type,
+            color: pick(PALETTE),
+            angle: rnd(0, Math.PI * 2),
+            size: gap * 0.38,
+            scale: restScale,
+            maxScale: rnd(minHoverScale, maxHoverScale),
+            hovered: false,
+            hoverEnergy: 0.0
+          };
+          if (type === 'star') Object.assign(shape, randomStarProps());
+          shapes.push(shape);
+        }
+      }
+      return { shapes: shapes, width: W, height: H };
+    }
+
+    function initGridCanvas() {
+      var W = window.innerWidth;
+      var H = window.innerHeight;
+      var dpr = window.devicePixelRatio || 1;
+
+      bgCanvas.width = W * dpr;
+      bgCanvas.height = H * dpr;
+      bgCanvas.style.width = W + 'px';
+      bgCanvas.style.height = H + 'px';
+      bgCtx.setTransform(1, 0, 0, 1, 0, 0);
+      bgCtx.scale(dpr, dpr);
+
+      grid = buildGrid();
+    }
+
+    function tickGridCanvas() {
+      if (!grid) {
+        rafId = requestAnimationFrame(tickGridCanvas);
+        return;
+      }
+
+      var shapes = grid.shapes;
+      var width = grid.width;
+      var height = grid.height;
+      var radius = Math.min(width, height) * (radiusVmin / 100);
+      var now = performance.now();
+
+      bgCtx.fillStyle = '#050505';
+      bgCtx.fillRect(0, 0, width, height);
+
+      for (var l = 0; l < lights.length; l++) {
+        var lit = lights[l];
+        lit.x += lit.vx;
+        lit.y += lit.vy;
+        if (lit.x < 0 || lit.x > 1) lit.vx *= -1;
+        if (lit.y < 0 || lit.y > 1) lit.vy *= -1;
+
+        var lx = lit.x * width;
+        var ly = lit.y * height;
+        var r = lit.radius * Math.min(width, height);
+        var grad = bgCtx.createRadialGradient(lx, ly, 0, lx, ly, r);
+        grad.addColorStop(0, lit.color);
+        grad.addColorStop(1, 'rgba(5, 5, 5, 0)');
+        bgCtx.fillStyle = grad;
+        bgCtx.fillRect(0, 0, width, height);
+      }
+
+      activity *= 0.99;
+      frameCount++;
+      if (frameCount % 10 === 0) {
+        maskRects = Array.from(document.querySelectorAll('[data-shape-mask]'))
+          .map(function(el) { return el.getBoundingClientRect(); });
+      }
+
+      var maxDist = Math.sqrt(width * width + height * height);
+      waves = waves.filter(function(w) {
+        return (now - w.startTime) / 1000 * waveSpeed < maxDist + waveWidth;
+      });
+
+      for (var i = 0; i < shapes.length; i++) {
+        var shape = shapes[i];
+        var pad = gap / 2;
+        var masked = !maskOverride && maskRects.some(function(r) {
+          return shape.x >= r.left - pad && shape.x <= r.right  + pad &&
+                 shape.y >= r.top  - pad && shape.y <= r.bottom + pad;
+        });
+
+        if (masked) {
+          shape.scale += (0 - shape.scale) * durationToFactor(speedOut);
+          if (shape.scale < 0.005) shape.scale = 0;
+          continue;
+        }
+
+        shape.angle += 0.004;
+
+        var targetHover = 0;
+        if (pointer) {
+          var dx = shape.x - pointer.x;
+          var dy = shape.y - pointer.y;
+          var dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < radius) {
+            targetHover = smoothstep(1 - dist / radius);
+          }
+        }
+
+        if (targetHover > shape.hoverEnergy) {
+          shape.hoverEnergy += (targetHover - shape.hoverEnergy) * 0.2;
+        } else {
+          shape.hoverEnergy += (targetHover - shape.hoverEnergy) * 0.002;
+        }
+
+        var waveInfluence = 0;
+        for (var j = 0; j < waves.length; j++) {
+          var wave = waves[j];
+          var waveRadius = (now - wave.startTime) / 1000 * waveSpeed;
+          var wdx = shape.x - wave.x;
+          var wdy = shape.y - wave.y;
+          var wdist = Math.sqrt(wdx * wdx + wdy * wdy);
+          var t = 1 - Math.abs(wdist - waveRadius) / waveWidth;
+          if (t > 0) waveInfluence = Math.max(waveInfluence, Math.sin(Math.PI * t));
+        }
+
+        var combinedInfluence = Math.max(shape.hoverEnergy * scaleMultiplier, waveInfluence);
+        var target = combinedInfluence * shape.maxScale;
+
+        var factor = target > shape.scale ? durationToFactor(speedIn) : durationToFactor(speedOut);
+        shape.scale += (target - shape.scale) * factor;
+
+        if (shape.scale < 0.005) continue;
+
+        bgCtx.save();
+        bgCtx.translate(shape.x, shape.y);
+        bgCtx.rotate(shape.angle);
+        bgCtx.scale(shape.scale, shape.scale);
+        bgCtx.fillStyle = resolveFill(bgCtx, shape.color, shape.size);
+        drawShape(bgCtx, shape);
+        bgCtx.restore();
+      }
+
+      rafId = requestAnimationFrame(tickGridCanvas);
+    }
+
+    function onPointerMove(e) {
+      pointer = { x: e.clientX, y: e.clientY };
+      activity = 1;
+    }
+
+    function onCanvasClick(e) {
+      triggerWave(e.clientX, e.clientY);
+    }
+
+    function triggerWave(x, y) {
+      x = x !== undefined ? x : window.innerWidth / 2;
+      y = y !== undefined ? y : window.innerHeight / 2;
+      waves.push({ x: x, y: y, startTime: performance.now() });
+      maskOverride = true;
+      var delay = Math.sqrt(window.innerWidth * window.innerWidth + window.innerHeight * window.innerHeight) / waveSpeed;
+      setTimeout(function() { maskOverride = false; }, delay * 1000);
+    }
+
+    window.addEventListener('resize', initGridCanvas);
+    window.addEventListener('pointermove', onPointerMove);
+    window.addEventListener('click', onCanvasClick);
+
+    document.getElementById('bg-scale-select').addEventListener('change', (e) => {
+      scaleMultiplier = parseFloat(e.target.value);
+    });
+
+    initGridCanvas();
+    rafId = requestAnimationFrame(tickGridCanvas);
+    triggerWave();
+
+    let toggleMenu;
+    function initFixedUnderlayNavigation() {
+      CustomEase.create("energy", "M0,0 C0.32,0.72 0,1 1,1");
+      const toggleBtn = document.querySelector("[data-underlay-nav-toggle]");
+      const toggleLabels = document.querySelectorAll(".underlay-nav__toggle-label");
+      const toggleBars = document.querySelectorAll(".underlay-nav__toggle-bar");
+      const menuEl = document.querySelector("[data-underlay-nav-menu]");
+      const largeItems = document.querySelectorAll("[data-reveal-l]");
+      const mainEl = document.querySelector("[data-main]");
+      const overlayEl = document.querySelector("[data-underlay-nav-overlay]");
+      
+      if (!toggleBtn || !menuEl || !mainEl || !overlayEl) return;
+      
+      let isOpen = false;
+      let tl;
+      
+      const getMenuOffset = () => -menuEl.offsetWidth;
+      
+      gsap.set(overlayEl, { visibility: "hidden", pointerEvents: "none" });
+      gsap.set(mainEl, { x: 0 });
+      gsap.set(toggleLabels, { yPercent: 0 });
+      gsap.set(toggleBars, { y: 0, rotation: 0 });
+      
+      function buildTimeline() {
+        tl = gsap.timeline({
+          paused: true,
+          defaults: {
+            ease: "energy",
+            easeReverse: "power2.inOut"
+          }
+        });
+        
+        tl.set(overlayEl, { visibility: "visible", pointerEvents: "auto" }, 0);
+        
+        tl.to([mainEl, overlayEl], {
+          x: getMenuOffset,
+          duration: 0.7,
+        }, 0)
+        
+        .to(toggleLabels, {
+          yPercent: -100,
+          duration: 0.4,
+        }, 0)
+        
+        .to(toggleBars[0], {
+          y: "0.22em",
+          rotation: 45,
+          duration: 0.35,
+          ease: "back.out(1.4)",
+          easeReverse: "power3.out",
+        }, 0.05)
+        
+        .to(toggleBars[1], {
+          y: "-0.22em",
+          rotation: -45,
+          duration: 0.35,
+          ease: "back.out(1.4)",
+          easeReverse: "power3.out",
+        }, 0.05)
+        
+        .fromTo(largeItems,
+          { autoAlpha: 0, xPercent: 25 },
+          {
+            autoAlpha: 1,
+            xPercent: 0,
+            duration: 0.7,
+            stagger: 0.05,
+          },
+          0
+        );
+      }
+      
+      toggleMenu = function() {
+        isOpen = !isOpen;
+        toggleBtn.setAttribute("aria-expanded", String(isOpen));
+        
+        if (isOpen) {
+          tl.invalidate();
+          tl.timeScale(1).play();
+          gsap.to(overlayEl, { opacity: 1, duration: 0.5 });
+        } else {
+          tl.timeScale(1).reverse();
+          gsap.to(overlayEl, { opacity: 0, duration: 0.5 });
+        }
+      };
+      
+      buildTimeline();
+      toggleBtn.addEventListener("click", toggleMenu);
+      overlayEl.addEventListener("click", () => {
+        if (isOpen) toggleMenu();
+      });
+      
+      let resizeTimer;
+      window.addEventListener("resize", () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => {
+          if (isOpen) {
+            gsap.set([mainEl, overlayEl], {
+              x: getMenuOffset()
+            });
+          } else {
+            tl.invalidate();
+          }
+        }, 150);
+      });
+    }
+
+    function initWillemLoadingAnimation() {
+      const container = document.querySelector(".willem-header");
+      const loadingLetter = container.querySelectorAll(".willem__letter");
+      const box = container.querySelectorAll(".willem-loader__box");
+      const growingImage = container.querySelectorAll(".willem__growing-image");
+      const headingStart = container.querySelectorAll(".willem__h1-start");
+      const headingEnd = container.querySelectorAll(".willem__h1-end");
+      const coverImageExtra = container.querySelectorAll(".willem__cover-image-extra");
+      const headerLetter = container.querySelectorAll(".willem__letter-white");
+      const navLinks = container.querySelectorAll(".willen-nav a, .osmo-credits__p");
+      
+      const tl = gsap.timeline({
+        defaults: {
+          ease: "expo.inOut",
+        },
+        onStart: () => {
+          container.classList.remove('is--hidden');
+        },
+        onComplete: () => {
+          setTimeout(() => {
+            gsap.to(container, {
+              opacity: 0,
+              duration: 1.0,
+              onComplete: () => {
+                container.classList.add('is--hidden');
+                container.remove();
+              }
+            });
+          }, 1000);
+        }
+      });
+      
+      if (loadingLetter) {
+        tl.from(loadingLetter, {
+          yPercent: 100,
+          stagger: 0.025,
+          duration: 1.25
+        });
+      }
+      
+      if (box.length) {
+        tl.fromTo(box, {
+          width: "0em",
+        },{
+          width: "1.2em",
+          duration: 1.25
+        }, "< 1.25");
+      }
+
+      if (box.length) {
+        tl.fromTo(growingImage, {
+          width: "0%",
+        },{
+          width: "100%",
+          duration: 1.25
+        }, "<");
+      }
+      
+      if (headingStart.length) {
+        tl.fromTo(headingStart, {
+          x: "0em",
+        },{
+          x: "-0.05em",
+          duration: 1.25
+        }, "<");
+      }
+      
+      if (headingEnd.length) {
+        tl.fromTo(headingEnd, {
+          x: "0em",
+        },{
+          x: "0.05em",
+          duration: 1.25
+        }, "<");
+      }
+
+      if (coverImageExtra.length) {
+        tl.fromTo(coverImageExtra, {
+          opacity: 1,
+        },{
+          opacity: 0,
+          duration: 0.05,
+          ease: "none",
+          stagger: 0.5
+        }, "-=0.05");
+      }
+        
+      if (growingImage.length) {
+        tl.to(growingImage, {
+          width: "100vw",
+          height: "100dvh",
+          duration: 2
+        }, "< 1.25");
+      }
+      
+      if (box.length) {
+        tl.to(box, {
+          width: "110vw",
+          duration: 2
+        }, "<");
+      }
+      
+      if (headerLetter.length) {
+        tl.from(headerLetter, {
+          yPercent: 100,
+          duration: 1.25,
+          ease: "expo.out",
+          stagger: 0.025
+        }, "< 1.2");
+      }
+
+      if (navLinks.length) {
+        tl.from(navLinks, {
+          yPercent: 100,
+          duration: 1.25,
+          ease: "expo.out",
+          stagger: 0.1
+        }, "<");
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      initWillemLoadingAnimation();
+      initFixedUnderlayNavigation();
+    });
+  </script>
+</body>
+</html>
